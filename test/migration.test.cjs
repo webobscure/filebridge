@@ -27,7 +27,7 @@ test('migration preserves IDs and secrets without putting passwords in global st
   assert.equal(f.secrets.get('password:old-profile'), 'private-value');
   assert.equal(f.secrets.get('password:settings-abc'), '');
   assert.ok(!JSON.stringify([...f.state]).includes('private-value'));
-  assert.equal(f.state.get('legacyMigrationComplete'), true);
+  assert.deepEqual([...f.state.keys()], ['servers']);
 });
 test('repeated import does not overwrite newer profiles or secrets', async () => {
   const f = fixture();

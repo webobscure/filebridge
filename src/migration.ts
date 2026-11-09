@@ -45,5 +45,6 @@ export async function importLegacyState(context: vscode.ExtensionContext, value:
   existing.forEach(validateProfile);
   const existingIds = new Set(existing.map(profile => profile.id));
   await context.globalState.update('servers', [...existing, ...state.servers.filter(profile => !existingIds.has(profile.id))]);
-  await context.globalState.update('legacyMigrationComplete', true);
+  // The helper owns the completion marker in its own context. Keep the target
+  // import to one state write: Memento saves whole snapshots, including servers.
 }
