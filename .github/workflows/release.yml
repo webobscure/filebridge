@@ -4,6 +4,9 @@ on:
     tags: ['v*']
 permissions:
   contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   validate:
     runs-on: ubuntu-24.04
@@ -20,7 +23,7 @@ jobs:
   build:
     needs: validate
     uses: ./.github/workflows/ci.yml
-  draft:
+  publish:
     needs: build
     runs-on: ubuntu-24.04
     permissions:
@@ -39,8 +42,17 @@ jobs:
       - run: node scripts/release-notes.mjs
         env:
           RELEASE_TAG: ${{ github.ref_name }}
-      - name: Create a draft release for review
+      - name: Verify release downloads
+        working-directory: release
+        run: sha256sum --check SHA256SUMS
+      - name: Publish GitHub Release with installable packages
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.ref_name }}
-        run: gh release create "$RELEASE_TAG" release/* --verify-tag --draft --title "FileBridge $RELEASE_TAG" --notes-file release-notes.md
+        run: |
+          if [[ "$RELEASE_TAG" == *-* ]]; then
+            flags=(--prerelease --latest=false)
+          else
+            flags=(--latest)
+          fi
+          gh release create "$RELEASE_TAG" release/* --verify-tag "${flags[@]}" --title "FileBridge $RELEASE_TAG" --notes-file release-notes.md

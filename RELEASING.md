@@ -36,7 +36,7 @@ native ZIP, `SHA256SUMS`, and `build-info.json` with package versions and the
 source commit. Verify downloaded files with `sha256sum -c SHA256SUMS` on Linux
 or `shasum -a 256 -c SHA256SUMS` on macOS. Generated packages are not committed.
 
-## Create a draft release
+## Publish a GitHub release automatically
 
 Create a `vVERSION` tag matching `package.json`, on the reviewed commit, and
 push that tag. For example, for version 0.6.1:
@@ -47,12 +47,23 @@ git push origin v0.6.1
 ```
 
 The **Release** workflow validates the tag and changelog, reruns the complete
-CI pipeline, assembles the files, and creates a **draft** GitHub Release with
-those files attached. It does not publish to an extension marketplace.
+CI pipeline, assembles the files, verifies their checksums, and **publishes** a
+GitHub Release with those files attached. Stable versions are marked Latest
+and appear in the repository's Releases sidebar. Tags containing a prerelease
+suffix (for example `v0.7.0-beta.1`) create prereleases instead.
 
-Review the draft, notes, checksums, and test reports before publishing it through
-GitHub's release page. Marketplace and Open VSX publishing require their own
-publisher credentials and remain separate actions.
+The public download includes the main VSIX, both migration helpers, the
+experimental PhpStorm ZIP, checksums, and build information. Release notes come
+from that version's `CHANGELOG.md` section. A failed validation, test, build, or
+checksum check prevents publication. Ordinary branch pushes do not publish a
+release; pushing the version tag is the release action.
+
+Review the version and changelog before pushing its tag. Marketplace and Open
+VSX publishing require their own publisher credentials and remain separate
+actions.
+
+Before the first registry release, complete the account and ownership checks in
+[Publisher setup](docs/PUBLISHING.md).
 
 ## Compatibility claims
 

@@ -1,0 +1,85 @@
+# Publisher setup
+
+FileBridge uses `publisher: Webobscure` and `name: filebridge` in
+`package.json`. Keep this identity in both registries. Manifest metadata and
+ownership of the GitHub repository do not establish registry permissions.
+
+## Readiness record — November 9, 2026
+
+| Registry | Confirmed | Still required |
+| --- | --- | --- |
+| Visual Studio Marketplace | `Webobscure` publisher created. The authenticated management page explicitly shows the current account's role as **Owner**. Public source and support links saved. | Publisher access is ready. Release upload and any automated publishing configuration are separate steps. |
+| Open VSX | Eclipse linked to `webobscure`; Publisher Agreement signed by the account holder. `Webobscure` namespace created; its settings show **Not verified**. Ownership request [#15480](https://github.com/EclipseFdn/open-vsx.org/issues/15480) submitted by `webobscure`. | Await administration's ownership decision. Recheck namespace verification and membership before releasing. |
+
+Marketplace ownership is confirmed at
+[publisher management](https://marketplace.visualstudio.com/manage/publishers/Webobscure).
+The Open VSX account completed the agreement and namespace-creation prerequisites.
+A new namespace assigns its creator Contributor access under the documented
+registry rules; verified ownership is still pending. The namespace UI warns that
+extensions can remain inactive until ownership is verified. No extension has
+been uploaded during this check. No publishing tokens were created or stored.
+
+## Visual Studio Marketplace
+
+Open [publisher management](https://marketplace.visualstudio.com/manage) and
+select `Webobscure`. Inspect membership: use Owner or a role explicitly permitted
+to publish. A successful CLI authentication check alone does not establish a
+publishing role. If the publisher does not exist, register the exact ID and
+complete the required account and agreement steps.
+
+For future automation, prefer Trusted Publishing with GitHub OIDC over a stored
+PAT. Global Azure DevOps PATs retire on December 1, 2026. Configure a policy only
+after the publishing workflow is reviewed: repository owner `webobscure`,
+repository `filebridge`, and the exact workflow filename and environment.
+The existing `release.yml` publishes GitHub Releases after successful checks;
+it does not publish to a registry.
+
+Source: [official publishing documentation](https://code.visualstudio.com/api/working-with-extensions/publishing-extension).
+
+## Open VSX
+
+Start at the [profile settings](https://open-vsx.org/user-settings/profile).
+Link the Eclipse account with GitHub username `webobscure` and review the
+Publisher Agreement. The account holder must approve the agreement before
+publishing.
+
+If Eclipse GitHub sign-in says that the provider login must be configured first,
+sign in using the existing Eclipse account and use
+[Linked Accounts](https://accounts.eclipse.org/user/linked-accounts) to connect
+`webobscure`. A GitHub authorization alone does not create this link.
+
+Inspect namespace settings for `Webobscure`. A new namespace gives its creator
+Contributor access, which permits publishing; verified ownership is a separate
+step. Request Owner status through the public namespace-claim process after
+logging in. Prepare the request with the repository link and GitHub identity;
+do not describe a pending request as approved ownership.
+
+Store publishing tokens only in an appropriate secret store. Never commit them
+or put them in issue text, screenshots, release notes, or chat.
+
+Sources: [publishing instructions](https://github.com/eclipse-openvsx/openvsx/wiki/Publishing-Extensions),
+[namespace access and ownership](https://github.com/eclipse-openvsx/openvsx/wiki/Namespace-Access).
+
+### Namespace ownership request
+
+Submitted: [Claiming namespace `Webobscure` — #15480](https://github.com/EclipseFdn/open-vsx.org/issues/15480).
+The request uses validation Option 2 (a Marketplace publisher without published
+extensions) and links the namespace, Marketplace publisher, source repository,
+and pinned manifest. It does not claim that approval has already been granted.
+
+After review, check that the Open VSX namespace is verified and `webobscure` is
+an Owner. Review Marketplace membership and remove any temporary verification
+access once the request closes; temporary review access does not expire by
+itself. Keep release uploads separate from this identity check.
+
+## Cursor
+
+Cursor obtains third-party extensions from Open VSX through its own marketplace
+proxy and review process. An Open VSX upload alone does not prove availability
+in Cursor: check search and installation after the registry release.
+
+Cursor's optional verification badge is separate from Open VSX namespace
+ownership. It requires a website on an owned domain linking to the Open VSX
+listing, a matching listing homepage, and a request on the Cursor forum.
+
+Source: [Cursor extension documentation](https://cursor.com/help/customization/extensions).
