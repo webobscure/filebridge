@@ -16,7 +16,10 @@
     "ftp",
     "ftps",
     "remote",
-    "filesystem"
+    "filesystem",
+    "search",
+    "cursor",
+    "remote files"
   ],
   "main": "./dist/extension.js",
   "extensionKind": [
@@ -297,5 +300,10 @@
   "homepage": "https://github.com/webobscure/filebridge#readme",
   "bugs": {
     "url": "https://github.com/webobscure/filebridge/issues"
-  }
+  },
+  "galleryBanner": {
+    "color": "#004CFF",
+    "theme": "dark"
+  },
+  "qna": "https://github.com/webobscure/filebridge/issues/new/choose"
 }

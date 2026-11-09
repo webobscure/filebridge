@@ -9,6 +9,7 @@ import subprocess
 import urllib.request
 import zipfile
 import xml.etree.ElementTree as ET
+import re
 
 root = Path(__file__).resolve().parent
 ide = Path(os.environ.get('PHPSTORM_HOME', '/Applications/PhpStorm.app/Contents'))
@@ -41,6 +42,14 @@ for source in (root / 'src/main/resources').rglob('*'):
         target = classes / source.relative_to(root / 'src/main/resources')
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, target)
+# Keep the marketplace copy and the description shown by the IDE identical.
+descriptor = classes / 'META-INF/plugin.xml'
+listing = (root.parent / 'docs/listing/jetbrains.html').read_text()
+text, count = re.subn(r'<description><!\[CDATA\[.*?\]\]></description>',
+    lambda _: '<description><![CDATA[\n' + listing + '\n  ]]></description>', descriptor.read_text(), flags=re.S)
+if count != 1:
+    raise SystemExit('Expected exactly one native plugin description.')
+descriptor.write_text(text)
 jar = build / 'filebridge.jar'
 with zipfile.ZipFile(jar, 'w', zipfile.ZIP_DEFLATED) as archive:
     for source in classes.rglob('*'):

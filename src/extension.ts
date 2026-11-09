@@ -92,7 +92,9 @@ export function activate(context: vscode.ExtensionContext): MigrationTarget {
         { uri, name: `${profile.name} (FTP${profile.protocol === 'ftp' ? '' : 'S'})` });
       if (!added) { throw new Error('Could not add the folder to your workspace. Try connecting again.'); }
     }
+    provider.refresh(uri);
     await vscode.commands.executeCommand('workbench.view.explorer');
+    await vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer');
   }
 
   context.subscriptions.push(vscode.commands.registerCommand('remoterfs.search', async (

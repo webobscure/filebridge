@@ -86,11 +86,11 @@ export class SearchResults implements vscode.TreeDataProvider<Result>, vscode.Di
               const uri = vscode.Uri.from({ scheme: SCHEME, authority: id, path: match.path });
               let file = this.files.get(match.path);
               if (!file) { file = new FileResult(uri); this.files.set(match.path, file); }
-              file.hits.push({ ...match, uri }); file.description = `${file.hits.length} matches`;
+              file.hits.push({ ...match, uri }); file.description = `${file.hits.length} ${file.hits.length === 1 ? 'match' : 'matches'}`;
               if (!this.timer) this.timer = setTimeout(() => { this.timer = undefined; this.changed.fire(); }, 150);
             }, (summary, file) => { progress.report({ message: `${summary.scanned} files · ${summary.matches} matches · ${file}` }); });
           const state = summary.cancelled ? 'Cancelled' : summary.limited ? 'Result limit reached' : summary.errors ? 'Finished with errors' : 'Finished';
-          this.status = `${state}: ${summary.matches} matches in ${this.files.size} files · ${summary.scanned} searched · ` +
+          this.status = `${state}: ${summary.matches} ${summary.matches === 1 ? 'match' : 'matches'} in ${this.files.size} ${this.files.size === 1 ? 'file' : 'files'} · ${summary.scanned} searched · ` +
             `${summary.excluded} excluded · ${summary.binary} binary/non-UTF-8 · ${summary.large} too large · ${summary.links} links · ${summary.errors} errors`;
           this.issues = summary.issues;
           if (summary.limited) this.issues.unshift('Search stopped at the result limit. Narrow the query or increase filebridge.search.maxResults.');

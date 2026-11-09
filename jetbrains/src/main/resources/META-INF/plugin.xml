@@ -1,8 +1,9 @@
 <idea-plugin>
   <id>com.webobscure.filebridge</id>
   <name>FileBridge</name>
-  <vendor>Webobscure</vendor>
-  <version>0.2.0</version>
+  <vendor url="https://github.com/webobscure">Webobscure</vendor>
+  <url>https://github.com/webobscure/filebridge</url>
+  <version>0.2.1</version>
   <description><![CDATA[
     Browse FTP/FTPS servers, edit remote UTF-8 files, and upload changes with Save.
     Configure connections with the same remotefs.remote JSON format as FileBridge for VS Code and Cursor.

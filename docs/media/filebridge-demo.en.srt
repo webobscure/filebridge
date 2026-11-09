@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:03,894
+Connect to your saved FTP server
+
+2
+00:00:03,894 --> 00:00:06,005
+Browse remote folders
+
+3
+00:00:06,005 --> 00:00:09,097
+Open a remote PHP file
+
+4
+00:00:09,097 --> 00:00:12,844
+Edit it in your editor
+
+5
+00:00:12,844 --> 00:00:15,266
+Save directly to FTP with Cmd+S / Ctrl+S

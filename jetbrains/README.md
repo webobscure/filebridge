@@ -11,7 +11,7 @@ This native build targets **PhpStorm 2026.2.x**, including the installed
 
 1. In PhpStorm, open **Settings → Plugins**.
 2. Open the gear menu and choose **Install Plugin from Disk…**.
-3. Select `filebridge-phpstorm-0.2.0.zip` from the workspace root.
+3. Select `filebridge-phpstorm-0.2.1.zip` from the workspace root.
 4. Restart the IDE if prompted.
 5. Open **Settings → Tools → FileBridge** and paste your connection JSON.
 6. Open **View → Tool Windows → FileBridge**, or use its right-side tool window button.

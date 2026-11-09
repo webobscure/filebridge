@@ -4,6 +4,10 @@
 [Report a bug](https://github.com/webobscure/filebridge/issues) ·
 [Builds and checks](https://github.com/webobscure/filebridge/actions/workflows/ci.yml)
 
+[Upgrade guide](https://github.com/webobscure/filebridge/blob/HEAD/docs/UPGRADING.md) ·
+[Known limitations](https://github.com/webobscure/filebridge/blob/HEAD/docs/LIMITATIONS.md) ·
+[Support](https://github.com/webobscure/filebridge/blob/HEAD/docs/SUPPORT.md)
+
 **Your server files, right in your editor.**
 
 Browse remote folders, open files, and save changes directly to your FTP or FTPS
@@ -12,6 +16,18 @@ editor's familiar Explorer and Save command.
 
 Inspired by [Remote FS by liximomo](https://github.com/liximomo/vscode-remote-fs),
 FileBridge brings the same direct editing workflow to a modern FTP/FTPS implementation.
+
+[![Connect, open, edit, and save over FTP](https://raw.githubusercontent.com/webobscure/filebridge/HEAD/docs/media/filebridge-demo.gif)](https://github.com/webobscure/filebridge/blob/HEAD/docs/media/filebridge-demo.mp4)
+
+[Watch the 15-second demo](https://github.com/webobscure/filebridge/blob/HEAD/docs/media/filebridge-demo.mp4).
+Recorded in a separate VS Code window against a disposable local FTP server.
+The saved file contents were verified on that server.
+
+**Before installing:** desktop VS Code API 1.90+ or compatible Cursor is required.
+SFTP/SSH and browser editors are unsupported. Remote search uses FileBridge's
+own command, with default limits of 10 MiB per file and 1,000 matches. Remote
+folders are virtual workspaces, without full local project synchronization.
+The separate PhpStorm plugin is experimental and targets build 262 only.
 
 ## Features
 
@@ -24,6 +40,8 @@ FileBridge brings the same direct editing workflow to a modern FTP/FTPS implemen
 - **Flexible password storage.** Use the editor's encrypted storage or an explicit JSON password.
 - **Save safeguards.** Upload through a temporary file, detect some external changes,
   and keep unsaved edits in the editor when a save fails.
+
+![A remote PHP file saved directly over FTP](https://raw.githubusercontent.com/webobscure/filebridge/HEAD/docs/media/05-saved.png)
 
 ## Install
 
@@ -43,6 +61,10 @@ The extension details page should show **FileBridge 0.6.1**, publisher
 **Webobscure**, and identifier `Webobscure.filebridge` (case-insensitive).
 
 ### Upgrade from an earlier publisher
+
+For a publisher-by-publisher checklist, including the original
+`liximomo.remotefs` extension, see the
+[complete upgrade guide](https://github.com/webobscure/filebridge/blob/HEAD/docs/UPGRADING.md).
 
 Version 0.5.0 uses publisher Webobscure. It installs as a separate extension from
 both previous identities: `remoter-fs-local.remoter-fs` (through 0.3.0) and
@@ -200,6 +222,8 @@ the result limit accepts 1–50,000 matches. The defaults are 10 MiB and 1,000.
 Use FileBridge's command for remote search. The editor's standard `Cmd+Shift+F`
 / `Ctrl+Shift+F` is not connected to the FTP search implementation.
 
+![Search unopened server files and open a matching line](https://raw.githubusercontent.com/webobscure/filebridge/HEAD/docs/media/07-search-result.png)
+
 ## Passwords and encryption
 
 Passwords entered through the wizard or **Change Password** are stored in the
@@ -262,7 +286,7 @@ Release packages are assembled only after all checks pass. Reports include the
 actual tested editor versions and architectures; see the workflow run for results.
 
 A native **FileBridge for PhpStorm** build is available as
-`filebridge-phpstorm-0.2.0.zip`, targeting PhpStorm 2026.2.x. Its sources, build
+`filebridge-phpstorm-0.2.1.zip`, targeting PhpStorm 2026.2.x. Its sources, build
 script, setup instructions, and validation status are in `jetbrains/README.md`.
 VS Code/Cursor continue to use the VSIX package described above.
 

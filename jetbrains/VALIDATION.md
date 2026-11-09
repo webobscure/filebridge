@@ -1,4 +1,4 @@
-# FileBridge for PhpStorm 0.2.0 validation
+# FileBridge for PhpStorm 0.2.1 validation
 
 ## Target and build
 
@@ -29,7 +29,7 @@ Tests used loopback-only pyftpdlib servers and disposable fixture data.
 JetBrains Plugin Verifier 1.411, offline, against the installed PhpStorm:
 
 ```text
-Plugin com.webobscure.filebridge:0.2.0 against PS-262.10315.130: Compatible
+Plugin com.webobscure.filebridge:0.2.1 against PS-262.10315.130: Compatible
 Dynamic Plugin Eligibility:
     Plugin can probably be enabled or disabled without IDE restart
 ```

@@ -2,10 +2,12 @@
 
 ## 0.6.1
 
+- Add real screenshots, a short FTP workflow video, English listing copy, support links, and detailed upgrade/limitations guides.
 - Add the public repository, bug reporting, cross-platform CI, and automated release packages with checksums.
 - Test VS Code 1.90.0 and current stable on Windows/Linux; support optional hosted macOS checks.
 - Preserve connections saved while migration is waiting for secure password storage.
 - Make FTP failure fixtures portable and isolate injected faults from background editor scans.
+- Refresh Explorer after reconnecting and polish singular search result labels.
 
 ## 0.6.0
 

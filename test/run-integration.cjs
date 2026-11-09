@@ -56,6 +56,7 @@ async function main() {
       const manifest = JSON.parse(await fs.readFile(path.join(project, 'package.json'), 'utf8'));
       manifest.main = './bootstrap.cjs';
       await fs.writeFile(path.join(extension, 'package.json'), JSON.stringify(manifest));
+      await fs.copyFile(path.join(project, 'dist/extension.js'), path.join(extension, 'extension.js'));
       await fs.writeFile(path.join(extension, 'bootstrap.cjs'), `
         exports.activate = async context => {
           require(${JSON.stringify(path.join(__dirname, 'trust-fixture.cjs'))});
@@ -63,26 +64,12 @@ async function main() {
           const profiles = fixture.profiles;
           await context.globalState.update('servers', profiles);
           for (const profile of profiles) await context.secrets.store('password:' + profile.id, profile.id === 'bad-login' ? 'wrong-password' : 'test-password');
-          const getState = context.globalState.get.bind(context.globalState);
-          let lastIds = '';
-          context.globalState.get = (key, fallback) => {
-            const value = getState(key, fallback);
-            if (key === 'servers') {
-              const ids = value.map(profile => profile.id).join(',');
-              if (ids !== lastIds) console.log('Fixture profile state:', ids);
-              lastIds = ids;
-            }
-            return value;
-          };
-          const api = require(${JSON.stringify(path.join(project, 'dist/extension.js'))}).activate(context);
-          return {importLegacyState: async state => {
-            await api.importLegacyState(state);
-            console.log('Migration profile IDs:', context.globalState.get('servers', []).map(profile => profile.id).join(','));
-          }};
+          return require('./extension.js').activate(context);
         };
       `);
       const legacyExtension = path.join(folder, 'legacy-extension');
       await fs.mkdir(legacyExtension);
+      await fs.copyFile(path.join(project, 'dist/legacy-migration.js'), path.join(legacyExtension, 'migration.js'));
       await fs.writeFile(path.join(legacyExtension, 'package.json'), JSON.stringify({
         name: 'remoter-fs', publisher: 'remoter-fs-local', version: '0.3.2',
         engines: {vscode: '^1.90.0'}, main: './bootstrap.cjs',
@@ -95,11 +82,12 @@ async function main() {
           await context.globalState.update('filebridgeMigrationComplete', true);
           await context.secrets.store('password:' + fixture.legacyProfile.id, 'test-password');
           await context.secrets.store('password:' + fixture.legacySecretId, 'test-password');
-          return require(${JSON.stringify(path.join(project, 'dist/legacy-migration.js'))}).activate(context);
+          return require('./migration.js').activate(context);
         };
       `);
       const previousExtension = path.join(folder, 'previous-extension');
       await fs.mkdir(previousExtension);
+      await fs.copyFile(path.join(project, 'dist/legacy-migration.js'), path.join(previousExtension, 'migration.js'));
       await fs.writeFile(path.join(previousExtension, 'package.json'), JSON.stringify({
         name: 'filebridge', publisher: 'FileBridge', version: '0.4.1', engines: {vscode: '^1.90.0'}, main: './bootstrap.cjs',
         contributes: {commands: [{command: 'filebridge.migrateLegacyConnections.filebridge-filebridge', title: 'Transfer Previous Publisher Connections'}]}
@@ -110,7 +98,7 @@ async function main() {
           await context.globalState.update('servers', [fixture.previousProfile]);
           await context.globalState.update('filebridgeMigrationComplete', true);
           await context.secrets.store('password:' + fixture.previousProfile.id, 'test-password');
-          return require(${JSON.stringify(path.join(project, 'dist/legacy-migration.js'))}).activate(context);
+          return require('./migration.js').activate(context);
         };
       `);
       const base = {name: 'Local FTP fixture', host: '127.0.0.1', port, protocol: 'ftp', username: 'tester', rootPath: '/public_html', timeout: 3000, atomicSave: true};
