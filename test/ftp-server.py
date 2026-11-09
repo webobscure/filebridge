@@ -20,9 +20,12 @@ class Handler(base):
     def ftp_MLSD(self, path):
         marker = os.path.join(root, 'drop-next-listing')
         if os.path.exists(marker):
-            os.unlink(marker)
-            self.close()
-            return
+            with open(marker, encoding='utf-8') as value:
+                target = value.read()
+            if os.path.normcase(os.path.normpath(path)) == os.path.normcase(os.path.normpath(target)):
+                os.unlink(marker)
+                self.close()
+                return
         return super().ftp_MLSD(path)
 
     # Exercise save failures without timing-dependent network races.

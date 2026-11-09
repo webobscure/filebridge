@@ -144,10 +144,13 @@ exports.run = async () => {
     assert.equal(await fs.readFile(disk('retry.txt'), 'utf8'), 'edited in editor');
   });
   await check('closed connection reopens on the next request without replay', async () => {
-    await fs.writeFile(path.join(fixture.root, 'drop-next-listing'), '1');
-    await assert.rejects(vscode.workspace.fs.readDirectory(uri('ftp-test')));
+    // Scope the fault to this folder: background editor scans must not consume it.
+    await fs.mkdir(disk('connection-probe'));
+    await fs.writeFile(path.join(fixture.root, 'drop-next-listing'), disk('connection-probe'));
+    await assert.rejects(vscode.workspace.fs.readDirectory(uri('ftp-test', '/connection-probe')));
     const entries = await vscode.workspace.fs.readDirectory(uri('ftp-test'));
     assert.ok(entries.some(([name]) => name === 'protected.txt'));
+    await fs.rmdir(disk('connection-probe'));
   });
   await check('direct overwrite mode', async () => {
     await write(uri('direct-test', '/direct.txt'), 'one');
