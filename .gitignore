@@ -6,3 +6,15 @@ out/
 jetbrains/build/
 jetbrains/lib/
 filebridge-phpstorm-*.zip
+.vscode-test/
+.tools/
+test-results/
+release/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+release-notes.md

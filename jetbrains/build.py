@@ -8,13 +8,16 @@ import shutil
 import subprocess
 import urllib.request
 import zipfile
+import xml.etree.ElementTree as ET
 
 root = Path(__file__).resolve().parent
 ide = Path(os.environ.get('PHPSTORM_HOME', '/Applications/PhpStorm.app/Contents'))
 if (ide / 'Contents').is_dir():
     ide = ide / 'Contents'
-java_home = Path(os.environ.get('JAVA_HOME', str(ide / 'jbr/Contents/Home')))
-product = json.loads((ide / 'Resources/product-info.json').read_text())
+bundled_java = ide / 'jbr/Contents/Home' if (ide / 'jbr/Contents/Home').exists() else ide / 'jbr'
+java_home = Path(os.environ.get('JAVA_HOME', str(bundled_java)))
+product_file = ide / 'Resources/product-info.json' if (ide / 'Resources/product-info.json').exists() else ide / 'product-info.json'
+product = json.loads(product_file.read_text())
 if not product['buildNumber'].startswith('262.'):
     raise SystemExit('This first native build targets PhpStorm 2026.2 (build 262).')
 dependency = root / 'lib/commons-net-3.13.0.jar'
@@ -43,7 +46,8 @@ with zipfile.ZipFile(jar, 'w', zipfile.ZIP_DEFLATED) as archive:
     for source in classes.rglob('*'):
         if source.is_file():
             archive.write(source, source.relative_to(classes))
-package = root.parent / 'filebridge-phpstorm-0.2.0.zip'
+version = ET.parse(root / 'src/main/resources/META-INF/plugin.xml').getroot().findtext('version')
+package = root.parent / ('filebridge-phpstorm-' + version + '.zip')
 with zipfile.ZipFile(package, 'w', zipfile.ZIP_DEFLATED) as archive:
     archive.write(jar, 'filebridge/lib/filebridge.jar')
     archive.write(dependency, 'filebridge/lib/commons-net-3.13.0.jar')

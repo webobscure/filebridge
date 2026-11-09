@@ -8,11 +8,13 @@ const { createHash } = require('node:crypto');
 
 async function main() {
   const project = path.resolve(__dirname, '..');
+  const resultsDir = path.resolve(process.env.REMOTER_TEST_RESULTS || path.join(project, 'test-results'));
+  await fs.mkdir(resultsDir, {recursive: true});
   // macOS Unix socket names are limited to 103 bytes; keep editor profiles short.
   const temporary = await fs.mkdtemp(path.join(process.platform === 'darwin' ? '/private/tmp' : os.tmpdir(), 'rfs-it-'));
   const root = path.join(temporary, 'server');
   await fs.mkdir(path.join(root, 'public_html'), {recursive: true});
-  const python = process.env.REMOTER_TEST_PYTHON || '/private/tmp/remoter-fs-test-venv/bin/python';
+  const python = process.env.REMOTER_TEST_PYTHON || (process.platform === 'darwin' ? '/private/tmp/remoter-fs-test-venv/bin/python' : 'python');
   const children = [];
   async function startServer(cert = '') {
     const child = spawn(python, [path.join(__dirname, 'ftp-server.py'), root, cert], {stdio: ['ignore', 'pipe', 'pipe']});
@@ -29,10 +31,8 @@ async function main() {
   }
   function certificate(name) {
     const cert = path.join(temporary, `${name}.pem`);
-    const key = path.join(temporary, `${name}.key`);
-    execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1',
-      '-subj', '/CN=localhost', '-addext', 'subjectAltName=IP:127.0.0.1,DNS:localhost', '-keyout', key, '-out', cert], {stdio: 'ignore'});
-    return fs.readFile(key).then(async bytes => { await fs.appendFile(cert, bytes); return cert; });
+    execFileSync(python, [path.join(__dirname, 'generate-cert.py'), cert], {stdio: 'inherit'});
+    return cert;
   }
   try {
     const cert = await certificate('trusted');
@@ -40,7 +40,9 @@ async function main() {
     const port = await startServer();
     const tlsPort = await startServer(cert);
     const badTlsPort = await startServer(untrusted);
-    const editors = process.env.REMOTER_TEST_EDITOR ? [[process.env.REMOTER_TEST_EDITOR, process.env.REMOTER_TEST_EXECUTABLE]] : [
+    const version = process.env.REMOTER_TEST_VSCODE_VERSION;
+    const editors = version ? [[`VS Code ${version}`, await require('@vscode/test-electron').downloadAndUnzipVSCode({version})]] :
+      process.env.REMOTER_TEST_EDITOR ? [[process.env.REMOTER_TEST_EDITOR, process.env.REMOTER_TEST_EXECUTABLE]] : [
       ['VS Code', '/Applications/Visual Studio Code.app/Contents/MacOS/Code'],
       ['Cursor', '/Applications/Cursor.app/Contents/MacOS/Cursor']
     ];
@@ -56,6 +58,7 @@ async function main() {
       await fs.writeFile(path.join(extension, 'package.json'), JSON.stringify(manifest));
       await fs.writeFile(path.join(extension, 'bootstrap.cjs'), `
         exports.activate = async context => {
+          require(${JSON.stringify(path.join(__dirname, 'trust-fixture.cjs'))});
           const fixture = JSON.parse(process.env.REMOTER_TEST_FIXTURE);
           const profiles = fixture.profiles;
           await context.globalState.update('servers', profiles);
@@ -112,9 +115,11 @@ async function main() {
       await fs.writeFile(workspace, JSON.stringify({folders: [{uri: 'remoterfs://ftp-test/', name: 'Local FTP fixture'}],
         settings: {'security.workspace.trust.enabled': false, 'files.autoSave': 'off', 'workbench.startupEditor': 'none', 'window.newWindowProfile': 'Default'}}));
       const env = {...process.env, NODE_EXTRA_CA_CERTS: cert,
-        REMOTER_TEST_FIXTURE: JSON.stringify({root, profiles, report, editor, legacyProfile, legacySecretId, previousProfile})};
+        REMOTER_TEST_FIXTURE: JSON.stringify({root, profiles, report, editor, legacyProfile, legacySecretId, previousProfile,
+          expectedVersion: version && version !== 'stable' ? version : undefined})};
       delete env.ELECTRON_RUN_AS_NODE;
       const child = spawn(executable, [
+        ...(process.platform === 'linux' ? ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'] : []),
         '--user-data-dir', path.join(folder, 'user-data'), '--extensions-dir', path.join(folder, 'extensions'),
         '--disable-extensions', '--disable-workspace-trust', '--skip-welcome', '--skip-release-notes',
         '--disable-updates', '--disable-telemetry', '--new-window',
@@ -125,13 +130,15 @@ async function main() {
       children.push(child);
       let logs = '';
       for (const stream of [child.stdout, child.stderr]) stream.on('data', chunk => { logs += chunk.toString(); });
-      const timer = setTimeout(() => { child.kill('SIGTERM'); }, 120000);
+      const timer = setTimeout(() => { child.kill('SIGTERM'); }, 180000);
       let code;
       try { [code] = await once(child, 'exit'); }
       finally { clearTimeout(timer); }
       await fs.writeFile(path.join(folder, 'editor.log'), logs);
+      await fs.writeFile(path.join(resultsDir, `${editor.replaceAll(' ', '-')}.log`), logs);
       if (code !== 0) { throw new Error(`${editor} integration failed (${code}). ${logs.slice(-6000)}\nLogs: ${folder}`); }
       const result = JSON.parse(await fs.readFile(report, 'utf8'));
+      await fs.copyFile(report, path.join(resultsDir, `${editor.replaceAll(' ', '-')}.json`));
       console.log(`${editor}: ${result.passed.length} integration checks passed. Report: ${report}`);
     }
   } finally {

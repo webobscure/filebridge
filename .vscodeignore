@@ -16,3 +16,12 @@ assets/remoter-fs-icon*.png
 .gitignore
 
 *.zip
+.github/**
+.tools/**
+.vscode-test/**
+test-results/**
+release/**
+CONTRIBUTING.md
+RELEASING.md
+AGENTS.md
+release-notes.md

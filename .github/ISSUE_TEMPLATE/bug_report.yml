@@ -1,0 +1,33 @@
+name: Bug report
+description: Report a FileBridge problem.
+title: "[Bug] "
+body:
+  - type: input
+    id: editor
+    attributes:
+      label: Editor and version
+      placeholder: VS Code 1.90.0, Cursor, or PhpStorm 2026.2.2
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Operating system and FileBridge version
+      placeholder: Windows 11, FileBridge 0.6.0
+    validations:
+      required: true
+  - type: dropdown
+    id: protocol
+    attributes:
+      label: Connection type
+      options:
+        - FTP
+        - FTPS (explicit TLS)
+        - FTPS (implicit TLS)
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include the expected and actual result. Remove passwords and private server details from logs or screenshots.
+    validations:
+      required: true

@@ -1,5 +1,9 @@
 # FileBridge
 
+[Source](https://github.com/webobscure/filebridge) ·
+[Report a bug](https://github.com/webobscure/filebridge/issues) ·
+[Builds and checks](https://github.com/webobscure/filebridge/actions/workflows/ci.yml)
+
 **Your server files, right in your editor.**
 
 Browse remote folders, open files, and save changes directly to your FTP or FTPS
@@ -29,8 +33,11 @@ FileBridge brings the same direct editing workflow to a modern FTP/FTPS implemen
 4. Open the Command Palette: `Cmd+Shift+P` on macOS or `Ctrl+Shift+P` on Windows/Linux.
 5. Run **FileBridge: Add Server**, or configure a connection in JSON as shown below.
 
-FileBridge currently ships as a local VSIX package. It is not published to an
-extension registry. It requires a desktop editor supporting VS Code API 1.90 or later.
+FileBridge ships as a VSIX package. Download the `filebridge-release` artifact
+from a successful [CI run](https://github.com/webobscure/filebridge/actions/workflows/ci.yml),
+or use a published [GitHub Release](https://github.com/webobscure/filebridge/releases)
+when available. It is not published to an extension registry. It requires a
+desktop editor supporting VS Code API 1.90 or later.
 
 The extension details page should show **FileBridge 0.6.0**, publisher
 **Webobscure**, and identifier `Webobscure.filebridge` (case-insensitive).
@@ -243,6 +250,14 @@ resolution with the same size, and races immediately before rename, may go undet
   that require local files may be limited. A local project copy is not synchronized.
 
 ## Development
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for cross-platform tests and
+[RELEASING.md](RELEASING.md) for versioning, checksums, and automated draft releases.
+
+GitHub Actions tests actual VS Code instances on Windows, Linux, and macOS with
+both 1.90.0 and current stable, and builds/verifies the native PhpStorm plugin.
+Release packages are assembled only after all checks pass. Reports include the
+actual tested editor versions and architectures; see the workflow run for results.
 
 A native **FileBridge for PhpStorm** build is available as
 `filebridge-phpstorm-0.2.0.zip`, targeting PhpStorm 2026.2.x. Its sources, build

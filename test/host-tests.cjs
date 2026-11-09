@@ -6,6 +6,7 @@ const {createHash} = require('node:crypto');
 
 exports.run = async () => {
   const fixture = JSON.parse(process.env.REMOTER_TEST_FIXTURE);
+  if (fixture.expectedVersion) assert.equal(vscode.version, fixture.expectedVersion, 'The requested VS Code version is running');
   const ext = vscode.extensions.getExtension('webobscure.filebridge');
   assert.ok(ext, 'Development extension is available');
   await ext.activate();
@@ -267,5 +268,6 @@ exports.run = async () => {
     assert.equal(await read(uri('concurrent-one', '/protected.txt')), 'original');
     assert.equal(await read(uri('concurrent-two', '/protected.txt')), 'original');
   });
-  await fs.writeFile(fixture.report, JSON.stringify({editor: fixture.editor, passed: results}, null, 2));
+  await fs.writeFile(fixture.report, JSON.stringify({editor: fixture.editor, version: vscode.version,
+    platform: process.platform, arch: process.arch, node: process.versions.node, passed: results}, null, 2));
 };

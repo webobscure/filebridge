@@ -269,8 +269,10 @@
     "test": "node --test test/*.test.cjs",
     "test:integration": "node test/run-integration.cjs",
     "vscode:prepublish": "npm run check && npm run build",
-    "package": "vsce package --no-dependencies --allow-missing-repository --out filebridge-0.6.0.vsix",
-    "package:migration": "npm run build && node scripts/package-migration.mjs"
+    "package": "node scripts/package.mjs",
+    "package:migration": "npm run build && node scripts/package-migration.mjs",
+    "release:collect": "node scripts/collect-release.mjs",
+    "test:minimum": "node test/run-minimum.cjs"
   },
   "dependencies": {
     "basic-ftp": "^6.2.6"
@@ -283,8 +285,17 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/vscode": "1.90.0",
+    "@vscode/test-electron": "3.1.0",
     "@vscode/vsce": "^4.1.0",
     "esbuild": "^0.25.0",
     "typescript": "^5.8.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/webobscure/filebridge.git"
+  },
+  "homepage": "https://github.com/webobscure/filebridge#readme",
+  "bugs": {
+    "url": "https://github.com/webobscure/filebridge/issues"
   }
 }
