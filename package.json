@@ -1,0 +1,290 @@
+{
+  "name": "filebridge",
+  "displayName": "FileBridge",
+  "description": "Your server files, right in your editor. Browse, search, and edit FTP/FTPS files with changes saved directly to your server.",
+  "version": "0.6.0",
+  "icon": "assets/filebridge-icon.png",
+  "publisher": "Webobscure",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "ftp",
+    "ftps",
+    "remote",
+    "filesystem"
+  ],
+  "main": "./dist/extension.js",
+  "extensionKind": [
+    "ui"
+  ],
+  "activationEvents": [
+    "onFileSystem:remoterfs"
+  ],
+  "capabilities": {
+    "virtualWorkspaces": true,
+    "untrustedWorkspaces": {
+      "supported": false
+    }
+  },
+  "contributes": {
+    "configuration": {
+      "title": "FileBridge",
+      "properties": {
+        "remotefs.remote": {
+          "type": "object",
+          "default": {},
+          "scope": "machine-overridable",
+          "markdownDescription": "Named FTP/FTPS connections, compatible with the original Remote FS configuration format. Each key identifies a server. Set `password` to store it as plain text, or omit it and run **FileBridge: Change Password** to use secure storage.",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "host",
+              "username"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Display name in Explorer. Defaults to the connection key."
+              },
+              "scheme": {
+                "type": "string",
+                "enum": [
+                  "ftp",
+                  "ftps",
+                  "ftps-implicit"
+                ],
+                "default": "ftp",
+                "description": "Connection protocol: FTP, FTPS with explicit TLS, or FTPS with implicit TLS."
+              },
+              "host": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Server hostname or IP address, without a protocol prefix or path."
+              },
+              "port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535,
+                "description": "Server port. Defaults to 21, or 990 for implicit FTPS."
+              },
+              "username": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Username used to sign in to the FTP server."
+              },
+              "password": {
+                "type": "string",
+                "description": "Plain-text password. Omit this field to use secure storage. An empty string sends an empty password."
+              },
+              "rootPath": {
+                "type": "string",
+                "default": "/",
+                "pattern": "^/",
+                "description": "Absolute remote folder to open in Explorer, for example /public_html."
+              },
+              "connectTimeout": {
+                "type": "integer",
+                "minimum": 1000,
+                "default": 30000,
+                "description": "Connection and transfer inactivity timeout in milliseconds."
+              },
+              "atomicSave": {
+                "type": "boolean",
+                "default": true,
+                "description": "Upload to a temporary file, then rename it. Preserves the original if the upload fails, but may change file permissions. Set to false to overwrite directly."
+              }
+            },
+            "additionalProperties": false
+          },
+          "defaultSnippets": [
+            {
+              "body": {
+                "${1:my-server}": {
+                  "scheme": "ftp",
+                  "host": "${2:ftp.example.com}",
+                  "port": 21,
+                  "username": "${3:user}",
+                  "rootPath": "/"
+                }
+              }
+            }
+          ]
+        },
+        "filebridge.search.exclude": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default": [],
+          "description": "Exact file/folder names anywhere, or paths relative to the search folder. Excluded folders are not traversed. No wildcards. Example: [\"node_modules\", \".git\", \"storage/logs\"]."
+        },
+        "filebridge.search.maxFileSizeMB": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 128,
+          "description": "Maximum file size in MiB for remote text search. Larger files are counted as skipped."
+        },
+        "filebridge.search.maxResults": {
+          "type": "integer",
+          "default": 1000,
+          "minimum": 1,
+          "maximum": 50000,
+          "description": "Stop remote search after this many matches. The results panel indicates when the limit is reached."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "remoterfs.openSettings",
+        "title": "FileBridge: Open Settings (JSON)",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "remoterfs.addServer",
+        "title": "FileBridge: Add Server",
+        "icon": "$(add)"
+      },
+      {
+        "command": "remoterfs.connect",
+        "title": "FileBridge: Connect",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "remoterfs.disconnect",
+        "title": "FileBridge: Disconnect"
+      },
+      {
+        "command": "remoterfs.refresh",
+        "title": "FileBridge: Refresh Folders",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "remoterfs.changePassword",
+        "title": "FileBridge: Change Password"
+      },
+      {
+        "command": "remoterfs.removeServer",
+        "title": "FileBridge: Remove Connection"
+      },
+      {
+        "command": "remoterfs.search",
+        "title": "FileBridge: Search Remote Files",
+        "icon": "$(search)"
+      },
+      {
+        "command": "remoterfs.cancelSearch",
+        "title": "FileBridge: Cancel Remote Search",
+        "icon": "$(debug-stop)"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "remoterfs.servers",
+          "name": "FileBridge"
+        },
+        {
+          "id": "remoterfs.searchResults",
+          "name": "FileBridge Search"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "remoterfs.servers",
+        "contents": "Browse remote folders and save changes directly to your FTP/FTPS server.\n[Add Server](command:remoterfs.addServer)\n[Configure in Settings (JSON)](command:remoterfs.openSettings)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "remoterfs.openSettings",
+          "when": "view == remoterfs.servers",
+          "group": "navigation"
+        },
+        {
+          "command": "remoterfs.addServer",
+          "when": "view == remoterfs.servers",
+          "group": "navigation"
+        },
+        {
+          "command": "remoterfs.refresh",
+          "when": "view == remoterfs.servers",
+          "group": "navigation"
+        },
+        {
+          "command": "remoterfs.search",
+          "when": "view == remoterfs.servers || view == remoterfs.searchResults",
+          "group": "navigation"
+        },
+        {
+          "command": "remoterfs.cancelSearch",
+          "when": "view == remoterfs.searchResults",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "remoterfs.connect",
+          "when": "view == remoterfs.servers && viewItem == server",
+          "group": "inline"
+        },
+        {
+          "command": "remoterfs.disconnect",
+          "when": "view == remoterfs.servers && viewItem == server"
+        },
+        {
+          "command": "remoterfs.changePassword",
+          "when": "view == remoterfs.servers && viewItem == server"
+        },
+        {
+          "command": "remoterfs.removeServer",
+          "when": "view == remoterfs.servers && viewItem == server"
+        },
+        {
+          "command": "remoterfs.search",
+          "when": "view == remoterfs.servers && viewItem == server"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "remoterfs.search",
+          "when": "resourceScheme == remoterfs",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "check": "tsc --noEmit",
+    "test": "node --test test/*.test.cjs",
+    "test:integration": "node test/run-integration.cjs",
+    "vscode:prepublish": "npm run check && npm run build",
+    "package": "vsce package --no-dependencies --allow-missing-repository --out filebridge-0.6.0.vsix",
+    "package:migration": "npm run build && node scripts/package-migration.mjs"
+  },
+  "dependencies": {
+    "basic-ftp": "^6.2.6"
+  },
+  "overrides": {
+    "@vscode/vsce": {
+      "minimatch": "^11.0.1"
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "1.90.0",
+    "@vscode/vsce": "^4.1.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.8.0"
+  }
+}
