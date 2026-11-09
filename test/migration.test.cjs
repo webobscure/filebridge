@@ -47,3 +47,13 @@ test('invalid migration payloads are rejected before writing any state or secret
     assert.equal(f.state.size, 0); assert.equal(f.secrets.size, 0);
   }
 });
+test('connections saved while secure storage is pending survive an import', async () => {
+  const f = fixture();
+  const added = {...profile, id: 'added-during-password-save'};
+  f.context.secrets.store = async (key, value) => {
+    f.secrets.set(key, value);
+    f.state.set('servers', [added]);
+  };
+  await importLegacyState(f.context, {servers: [profile], passwords: [{id: profile.id, password: 'private-value'}]});
+  assert.deepEqual(f.state.get('servers'), [added, profile]);
+});

@@ -8,7 +8,8 @@
    `jetbrains/src/main/resources/META-INF/plugin.xml` and native documentation.
    Its version is independent of the VS Code extension's version.
 3. Commit the changes on a `feature/...` or `fix/...` branch and push. Wait for
-   **CI**, including all six OS/editor-version combinations, to pass.
+   **CI**, including all four Windows/Linux/editor-version combinations, to pass.
+   Run the macOS suite locally or opt into hosted macOS checks manually.
 4. Test a release candidate against a disposable account on a real hosting
    server. Check connection setup, search, save, reconnect, and a failed save.
    Review the native plugin UI/save behavior in a licensed PhpStorm separately.
@@ -38,11 +39,11 @@ or `shasum -a 256 -c SHA256SUMS` on macOS. Generated packages are not committed.
 ## Create a draft release
 
 Create a `vVERSION` tag matching `package.json`, on the reviewed commit, and
-push that tag. For example, for version 0.6.0:
+push that tag. For example, for version 0.6.1:
 
 ```sh
-git tag v0.6.0
-git push origin v0.6.0
+git tag v0.6.1
+git push origin v0.6.1
 ```
 
 The **Release** workflow validates the tag and changelog, reruns the complete

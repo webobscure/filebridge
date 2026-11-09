@@ -29,7 +29,7 @@ FileBridge brings the same direct editing workflow to a modern FTP/FTPS implemen
 
 1. Open the **Extensions** panel in VS Code or Cursor.
 2. Open the `…` menu and select **Install from VSIX…**.
-3. Choose `filebridge-0.6.0.vsix`.
+3. Choose `filebridge-0.6.1.vsix`.
 4. Open the Command Palette: `Cmd+Shift+P` on macOS or `Ctrl+Shift+P` on Windows/Linux.
 5. Run **FileBridge: Add Server**, or configure a connection in JSON as shown below.
 
@@ -39,7 +39,7 @@ or use a published [GitHub Release](https://github.com/webobscure/filebridge/rel
 when available. It is not published to an extension registry. It requires a
 desktop editor supporting VS Code API 1.90 or later.
 
-The extension details page should show **FileBridge 0.6.0**, publisher
+The extension details page should show **FileBridge 0.6.1**, publisher
 **Webobscure**, and identifier `Webobscure.filebridge` (case-insensitive).
 
 ### Upgrade from an earlier publisher
@@ -50,7 +50,7 @@ both previous identities: `remoter-fs-local.remoter-fs` (through 0.3.0) and
 `remotefs.remote` setting, internal commands, and remote folder URIs remain compatible.
 
 If all your connections and passwords are in `settings.json`, disable the old
-extension, install FileBridge 0.6.0, and reload the editor. Your JSON configuration
+extension, install FileBridge 0.6.1, and reload the editor. Your JSON configuration
 will be read by FileBridge directly.
 
 To also keep wizard-created connections and passwords saved in secure storage:
@@ -60,7 +60,7 @@ To also keep wizard-created connections and passwords saved in secure storage:
    - **FileBridge** (0.4.0): `filebridge-migration-from-0.4-0.4.1.vsix`.
    - **remoter-fs-local** (through 0.3.0): `filebridge-migration-from-remoter-0.3.2.vsix`.
    Each helper replaces its corresponding old extension and uses that extension's storage.
-3. Install `filebridge-0.6.0.vsix` and reload the editor.
+3. Install `filebridge-0.6.1.vsix` and reload the editor.
 4. Wait for **Connections and saved passwords transferred**. If needed, run
    **FileBridge: Transfer Legacy Connections** with the matching source name from the Command Palette.
 5. Uninstall **FileBridge Migration Helper** after the success notification.
@@ -254,8 +254,10 @@ resolution with the same size, and races immediately before rename, may go undet
 See [CONTRIBUTING.md](CONTRIBUTING.md) for cross-platform tests and
 [RELEASING.md](RELEASING.md) for versioning, checksums, and automated draft releases.
 
-GitHub Actions tests actual VS Code instances on Windows, Linux, and macOS with
+GitHub Actions tests actual VS Code instances on Windows and Linux with
 both 1.90.0 and current stable, and builds/verifies the native PhpStorm plugin.
+Hosted macOS Intel checks can be enabled in a manual CI run; the same suite also
+runs locally on macOS, including Apple Silicon.
 Release packages are assembled only after all checks pass. Reports include the
 actual tested editor versions and architectures; see the workflow run for results.
 

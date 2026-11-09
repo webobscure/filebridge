@@ -63,7 +63,11 @@ async function main() {
           const profiles = fixture.profiles;
           await context.globalState.update('servers', profiles);
           for (const profile of profiles) await context.secrets.store('password:' + profile.id, profile.id === 'bad-login' ? 'wrong-password' : 'test-password');
-          return require(${JSON.stringify(path.join(project, 'dist/extension.js'))}).activate(context);
+          const api = require(${JSON.stringify(path.join(project, 'dist/extension.js'))}).activate(context);
+          return {importLegacyState: async state => {
+            await api.importLegacyState(state);
+            console.log('Migration profile IDs:', context.globalState.get('servers', []).map(profile => profile.id).join(','));
+          }};
         };
       `);
       const legacyExtension = path.join(folder, 'legacy-extension');

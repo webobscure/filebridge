@@ -4,7 +4,16 @@ on:
     branches: ['**']
   pull_request:
   workflow_dispatch:
+    inputs:
+      include_macos:
+        description: Include hosted macOS Intel checks (may wait for a runner)
+        type: boolean
+        default: false
   workflow_call:
+    inputs:
+      include_macos:
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -16,8 +25,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Intel CI complements the locally exercised Apple Silicon installation.
-        os: [ubuntu-24.04, windows-2022, macos-15-intel]
+        # Opt-in macOS avoids blocking releases during hosted macOS runner queues.
+        os: ${{ inputs.include_macos && fromJSON('["ubuntu-24.04","windows-2022","macos-15-intel"]') || fromJSON('["ubuntu-24.04","windows-2022"]') }}
         vscode: ['1.90.0', stable]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20

@@ -53,9 +53,14 @@ requires a licensed PhpStorm and remains a separate manual check.
 ## Automation
 
 Every branch push and pull request runs the VS Code integration suite on
-Windows, Linux, and macOS with both 1.90.0 and current stable, plus native plugin
+Windows and Linux with both 1.90.0 and current stable, plus native plugin
 build/transport/compatibility checks. Package assembly waits for all jobs to
 succeed. Download `filebridge-release` from that workflow's artifacts.
+
+To also check hosted macOS Intel, choose **Run workflow → Include hosted macOS
+Intel checks** on the CI workflow page. Hosted macOS capacity can cause long
+queues, so those jobs are opt-in. Local macOS/Apple Silicon runs use the same
+suite; their reports include the actual editor and architecture.
 
 Do not commit generated packages, SDKs, credentials, editor profiles, or test
 reports. Use [the release procedure](RELEASING.md) to prepare a release.

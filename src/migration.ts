@@ -34,14 +34,16 @@ export async function importLegacyState(context: vscode.ExtensionContext, value:
       throw new Error('Invalid legacy password data.');
     }
   }
-  const existing = context.globalState.get<ServerProfile[]>('servers', []);
-  existing.forEach(validateProfile);
-  // An explicit import is idempotent and never overwrites newer profiles or passwords.
-  const existingIds = new Set(existing.map(profile => profile.id));
+  context.globalState.get<ServerProfile[]>('servers', []).forEach(validateProfile);
   for (const secret of state.passwords) {
     const key = `password:${secret.id}`;
     if (await context.secrets.get(key) === undefined) { await context.secrets.store(key, secret.password); }
   }
+  // Secure storage may await OS interaction. Read profiles after those awaits so
+  // connections saved while passwords were being transferred are retained.
+  const existing = context.globalState.get<ServerProfile[]>('servers', []);
+  existing.forEach(validateProfile);
+  const existingIds = new Set(existing.map(profile => profile.id));
   await context.globalState.update('servers', [...existing, ...state.servers.filter(profile => !existingIds.has(profile.id))]);
   await context.globalState.update('legacyMigrationComplete', true);
 }

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.1
+
+- Add the public repository, bug reporting, cross-platform CI, and automated release packages with checksums.
+- Test VS Code 1.90.0 and current stable on Windows/Linux; support optional hosted macOS checks.
+- Preserve connections saved while migration is waiting for secure password storage.
+- Make FTP failure fixtures portable and isolate injected faults from background editor scans.
+
 ## 0.6.0
 
 - Search UTF-8 file contents recursively over FTP/FTPS, including unopened files and hidden folders.
