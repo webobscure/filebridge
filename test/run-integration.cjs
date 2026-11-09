@@ -63,6 +63,17 @@ async function main() {
           const profiles = fixture.profiles;
           await context.globalState.update('servers', profiles);
           for (const profile of profiles) await context.secrets.store('password:' + profile.id, profile.id === 'bad-login' ? 'wrong-password' : 'test-password');
+          const getState = context.globalState.get.bind(context.globalState);
+          let lastIds = '';
+          context.globalState.get = (key, fallback) => {
+            const value = getState(key, fallback);
+            if (key === 'servers') {
+              const ids = value.map(profile => profile.id).join(',');
+              if (ids !== lastIds) console.log('Fixture profile state:', ids);
+              lastIds = ids;
+            }
+            return value;
+          };
           const api = require(${JSON.stringify(path.join(project, 'dist/extension.js'))}).activate(context);
           return {importLegacyState: async state => {
             await api.importLegacyState(state);

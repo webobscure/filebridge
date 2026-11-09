@@ -17,7 +17,7 @@ export class Profiles {
   hasConfiguredPassword(id: string): boolean { return this.configured().passwords.has(id); }
   get(id: string): ServerProfile {
     const profile = this.list().find(p => p.id === id);
-    if (!profile) { throw vscode.FileSystemError.Unavailable('Connection not found. Add a server in FileBridge.'); }
+    if (!profile) { throw vscode.FileSystemError.Unavailable(`Connection not found (${id}). Add a server in FileBridge.`); }
     return profile;
   }
   async add(profile: ServerProfile, password: string): Promise<void> {
