@@ -22,6 +22,8 @@ npm run build
 Integration tests exercise listing, reads, editor saves, search, cancellation,
 failed uploads, conflicts, permissions, TLS validation, JSON settings, and
 publisher migrations against disposable loopback FTP/FTPS servers.
+The fixture uses replacement-capable rename semantics on every OS. Real servers
+that refuse replacement by rename require FileBridge's documented direct save mode.
 
 Set `REMOTER_TEST_PYTHON` to the Python executable with the fixture dependencies.
 Set `REMOTER_TEST_VSCODE_VERSION=1.90.0` or `stable` to download and test an

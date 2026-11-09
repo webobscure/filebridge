@@ -5,9 +5,16 @@ import sys
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler, TLS_FTPHandler
 from pyftpdlib.servers import FTPServer
+from pyftpdlib.filesystems import AbstractedFS
 
 root, cert = sys.argv[1:3]
 base = TLS_FTPHandler if cert else FTPHandler
+
+class ReplaceFS(AbstractedFS):
+    # Model a server supporting atomic replacement by RNTO on every fixture OS.
+    # Python's os.rename replaces files on Unix but refuses an existing target on Windows.
+    def rename(self, src, dst):
+        return os.replace(src, dst)
 
 class Handler(base):
     def ftp_MLSD(self, path):
@@ -35,6 +42,7 @@ authorizer = DummyAuthorizer()
 authorizer.add_user('tester', 'test-password', root, perm='elradfmwMT')
 authorizer.add_user('reader', 'test-password', root, perm='elr')
 Handler.authorizer = authorizer
+Handler.abstracted_fs = ReplaceFS
 if cert:
     Handler.certfile = cert
     Handler.keyfile = cert
