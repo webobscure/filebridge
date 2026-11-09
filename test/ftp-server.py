@@ -22,7 +22,7 @@ class Handler(base):
         if os.path.exists(marker):
             with open(marker, encoding='utf-8') as value:
                 target = value.read()
-            if os.path.normcase(os.path.normpath(path)) == os.path.normcase(os.path.normpath(target)):
+            if self.fs.fs2ftp(path) == target:
                 os.unlink(marker)
                 self.close()
                 return
