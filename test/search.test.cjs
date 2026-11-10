@@ -69,7 +69,44 @@ test('case-sensitive queries and invalid parameters', async () => {
   const data = fixture({'/a': 'Needle needle'});
   const summary = await searchRemote(data.source, '/', {...options, caseSensitive: true}, () => false, () => {});
   assert.equal(summary.matches, 1);
-  for (const patch of [{query: ''}, {query: 'a\nb'}, {maxResults: 0}, {exclude: ['../x']}, {exclude: ['*.log']}]) {
+  for (const patch of [{query: ''}, {query: 'a\nb'}, {maxResults: 0}, {exclude: ['../x']}, {exclude: ['*.log']},
+    {concurrency: 0}, {concurrency: 6}, {concurrency: 1.5}, {extensions: ['*.php']}, {extensions: ['php']}, {extensions: null}]) {
     await assert.rejects(searchRemote(data.source, '/', {...options, ...patch}, () => false, () => {}));
   }
+});
+
+test('parallel search bounds in-flight reads and filters extensions before downloading', async () => {
+  const data = fixture(Object.fromEntries(Array.from({length: 12}, (_, i) => [`/sub/${i}.PHP`, 'needle'])));
+  const original = data.source.read;
+  let active = 0, peak = 0;
+  data.source.read = async file => {
+    peak = Math.max(peak, ++active);
+    await new Promise(resolve => setImmediate(resolve));
+    active--;
+    return original(file);
+  };
+  const summary = await searchRemote(data.source, '/', {...options, concurrency: 3, extensions: ['.php']}, () => false, () => {});
+  assert.equal(peak, 3); assert.equal(summary.matches, 12); assert.equal(summary.errors, 0);
+  const filtered = fixture({'/a.php': 'needle', '/nested/a.JS': 'needle', '/skip.log': 'needle', '/noextension': 'needle'});
+  const result = await searchRemote(filtered.source, '/', {...options, concurrency: 3, extensions: ['.php', '.js']}, () => false, () => {});
+  assert.equal(result.matches, 2); assert.equal(result.excluded, 2);
+  assert.deepEqual(filtered.reads.sort(), ['/a.php', '/nested/a.JS']);
+});
+
+test('parallel result limit closes pending transfers without overshooting or reporting their errors', async () => {
+  let stopped = false, reads = 0;
+  const source = {
+    async list() { return Array.from({length: 12}, (_, i) => ({name: `${i}.txt`, size: 1, directory: false, link: false})); },
+    async read() {
+      reads++;
+      await new Promise(resolve => setImmediate(resolve));
+      if (stopped) throw new Error('transport closed');
+      return Buffer.from('needle needle');
+    },
+    stop() { stopped = true; }
+  };
+  const hits = [];
+  const result = await searchRemote(source, '/', {...options, concurrency: 3, maxResults: 1}, () => false, hit => hits.push(hit));
+  assert.equal(result.matches, 1); assert.equal(hits.length, 1); assert.equal(reads, 3);
+  assert.equal(result.errors, 0); assert.equal(result.limited, true); assert.equal(stopped, true);
 });

@@ -54,7 +54,57 @@ exports.run = async () => {
     const limited = await vscode.commands.executeCommand('remoterfs.search', uri('ftp-test', '/search'), {...options, maxResults: 1});
     assert.equal(limited.matches, 1); assert.equal(limited.limited, true);
   });
-  await check('cancel remote search and continue editing on the same connection', async () => {
+  await check('parallel FTP search uses separate connections and filters downloads', async () => {
+    await fs.mkdir(disk('search/parallel'), {recursive: true});
+    await Promise.all(Array.from({length: 12}, (_, i) => fs.writeFile(disk(`search/parallel/${i}.PHP`), 'ParallelToken')));
+    await fs.writeFile(disk('search/parallel/skip.log'), 'ParallelToken');
+    const marker = path.join(fixture.root, 'slow-search');
+    await fs.writeFile(marker, '0.12');
+    try {
+      const options = {query: 'ParallelToken', caseSensitive: true, extensions: ['.php']};
+      const started = Date.now();
+      const serial = await vscode.commands.executeCommand('remoterfs.search', uri('ftp-test', '/search/parallel'), {...options, concurrency: 1});
+      const serialMs = Date.now() - started;
+      assert.equal(JSON.parse(await fs.readFile(path.join(fixture.root, 'search-transfers.json'))).peak, 1);
+      const parallelStart = Date.now();
+      const parallel = await vscode.commands.executeCommand('remoterfs.search', uri('ftp-test', '/search/parallel'), {...options, concurrency: 3});
+      const parallelMs = Date.now() - parallelStart;
+      assert.equal(parallel.matches, 12); assert.equal(parallel.excluded, 1); assert.equal(parallel.errors, 0);
+      assert.equal(serial.matches, parallel.matches);
+      assert.equal(JSON.parse(await fs.readFile(path.join(fixture.root, 'search-transfers.json'))).peak, 3);
+      console.log(`SEARCH BENCHMARK ${JSON.stringify({files: 12, delayMs: 120, serialMs, parallelMs})}`);
+    } finally { await fs.rm(marker, {force: true}); }
+  });
+  await check('saving completes while three search downloads are held, and cancellation releases them', async () => {
+    const slow = path.join(fixture.root, 'slow-search'), hold = path.join(fixture.root, 'hold-search');
+    await fs.writeFile(slow, '0.01'); await fs.writeFile(hold, 'hold');
+    const pending = vscode.commands.executeCommand('remoterfs.search', uri('ftp-test', '/search/parallel'), {
+      query: 'ParallelToken', caseSensitive: true, extensions: ['.php'], concurrency: 3
+    });
+    try {
+      const deadline = Date.now() + 10000;
+      let waiting = 0;
+      while (waiting !== 3 && Date.now() < deadline) {
+        try { waiting = JSON.parse(await fs.readFile(path.join(fixture.root, 'search-transfers.json'))).waiting; } catch {}
+        if (waiting !== 3) await new Promise(resolve => setTimeout(resolve, 20));
+      }
+      assert.equal(waiting, 3, 'Three dedicated search connections reached the fixture barrier');
+      let timer;
+      try {
+        await Promise.race([write(uri('ftp-test', '/search/independent-save.txt'), 'saved during search'),
+          new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Editor save was blocked by search')), 5000); })]);
+      } finally { clearTimeout(timer); }
+      assert.equal(await fs.readFile(disk('search/independent-save.txt'), 'utf8'), 'saved during search');
+      assert.equal(JSON.parse(await fs.readFile(path.join(fixture.root, 'search-transfers.json'))).waiting, 3);
+      await vscode.commands.executeCommand('remoterfs.cancelSearch');
+      const result = await pending;
+      assert.equal(result.cancelled, true); assert.equal(result.errors, 0);
+    } finally {
+      await vscode.commands.executeCommand('remoterfs.cancelSearch');
+      await fs.rm(hold, {force: true}); await fs.rm(slow, {force: true}); await pending;
+    }
+  });
+  await check('cancel remote search and continue editing', async () => {
     await fs.mkdir(disk('search/cancel'), {recursive: true});
     await Promise.all(Array.from({length: 60}, (_, i) => fs.writeFile(disk(`search/cancel/${i}.txt`), 'SearchToken')));
     const pending = vscode.commands.executeCommand('remoterfs.search', uri('ftp-test', '/search/cancel'), {query: 'SearchToken', caseSensitive: true});

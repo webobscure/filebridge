@@ -2,7 +2,7 @@
   "name": "filebridge",
   "displayName": "FileBridge",
   "description": "Your server files, right in your editor. Browse, search, and edit FTP/FTPS files with changes saved directly to your server.",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "icon": "assets/filebridge-icon.png",
   "publisher": "Webobscure",
   "license": "MIT",
@@ -127,6 +127,19 @@
           },
           "default": [],
           "description": "Exact file/folder names anywhere, or paths relative to the search folder. Excluded folders are not traversed. No wildcards. Example: [\"node_modules\", \".git\", \"storage/logs\"]."
+        },
+        "filebridge.search.connections": {
+          "type": "integer",
+          "default": 3,
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Maximum separate FTP/FTPS connections used for parallel search. Editor saves use their own connection. Set to 1 if your hosting limits concurrent logins."
+        },
+        "filebridge.search.extensions": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^\\.[a-zA-Z0-9][a-zA-Z0-9._+-]*$" },
+          "default": [],
+          "description": "Only download files ending in these extensions (case-insensitive), for example [\".php\", \".js\", \".html\"]. Empty searches all file types. No wildcards."
         },
         "filebridge.search.maxFileSizeMB": {
           "type": "integer",

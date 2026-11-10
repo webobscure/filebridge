@@ -17,6 +17,35 @@ class ReplaceFS(AbstractedFS):
         return os.replace(src, dst)
 
 class Handler(base):
+    search_waiting = 0
+    search_peak = 0
+
+    def ftp_RETR(self, file):
+        marker = os.path.join(root, 'slow-search')
+        if os.path.exists(marker) and self.fs.fs2ftp(file).startswith('/public_html/search/parallel/'):
+            with open(marker, encoding='utf-8') as value:
+                delay = float(value.read())
+            Handler.search_waiting += 1
+            Handler.search_peak = max(Handler.search_peak, Handler.search_waiting)
+
+            def record():
+                with open(os.path.join(root, 'search-transfers.json'), 'w', encoding='utf-8') as stats:
+                    json.dump({'waiting': Handler.search_waiting, 'peak': Handler.search_peak}, stats)
+
+            def resume():
+                if self.connected and os.path.exists(os.path.join(root, 'hold-search')):
+                    self.ioloop.call_later(0.02, resume)
+                    return
+                Handler.search_waiting -= 1
+                record()
+                if self.connected:
+                    base.ftp_RETR(self, file)
+
+            record()
+            self.ioloop.call_later(delay, resume)
+            return
+        return super().ftp_RETR(file)
+
     def ftp_MLSD(self, path):
         marker = os.path.join(root, 'drop-next-listing')
         if os.path.exists(marker):

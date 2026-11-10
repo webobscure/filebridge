@@ -115,6 +115,8 @@ export function activate(context: vscode.ExtensionContext): MigrationTarget {
       if (!mode) return;
       const config = vscode.workspace.getConfiguration('filebridge.search', uri);
       const options: SearchOptions = { query, caseSensitive: mode.value,
+        concurrency: supplied?.concurrency ?? config.get<number>('connections', 3),
+        extensions: supplied?.extensions ?? config.get<string[]>('extensions', []),
         exclude: supplied?.exclude ?? config.get<string[]>('exclude', []),
         maxFileBytes: supplied?.maxFileBytes ?? config.get<number>('maxFileSizeMB', 10) * 1024 * 1024,
         maxResults: supplied?.maxResults ?? config.get<number>('maxResults', 1000) };

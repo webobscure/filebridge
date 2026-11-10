@@ -23,7 +23,10 @@ they do not establish native PhpStorm UI behavior.
 Search reads server contents, including unopened UTF-8 files in the chosen
 folder and its descendants. Unsaved local edits are not included. FTP has no
 server-side content-search command, so candidate files are downloaded into
-memory one at a time. Large projects and slower servers take longer.
+memory. Large projects and slower servers take longer. VS Code/Cursor uses up
+to three dedicated search connections by default (configurable from 1 to 5),
+plus the editor's connection. Some hosts require reducing this to 1. PhpStorm
+currently searches one file at a time on its separate search connection.
 
 - Literal, single-line text; optional case sensitivity. No regular expressions,
   multiline matching, or replace-all.
@@ -33,6 +36,10 @@ memory one at a time. Large projects and slower servers take longer.
   skipped. Unreadable paths are reported. Cancellation retains partial results.
 - No default exclusions. Optional exclusions are exact names or relative paths,
   without wildcards. Editor exclusions and `.gitignore` do not control this search.
+- VS Code/Cursor can filter downloads with `filebridge.search.extensions`, for
+  example `[".php", ".js"]`. Empty includes all types. Concurrent results arrive
+  in download order. Each in-flight download may use up to the per-file memory
+  limit; cancellation and the result limit close search transports only.
 
 VS Code files are loaded into memory for editing. Native PhpStorm editing is
 limited to UTF-8 text files up to **32 MiB**, even if its search limit is higher.

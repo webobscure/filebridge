@@ -5,11 +5,30 @@ import { SerialQueue, ServerProfile } from './model';
 import { Profiles } from './profiles';
 
 interface Session { client: Client; queue: SerialQueue; signature?: string }
+export interface ReadSession {
+  run<T>(operation: (client: Client, profile: ServerProfile) => Promise<T>): Promise<T>;
+  dispose(): void;
+}
 export class Connections implements vscode.Disposable {
   private readonly sessions = new Map<string, Session>();
   private readonly blocked = new Set<string>();
   private disposed = false;
-  constructor(private readonly profiles: Profiles) {}
+  private readonly readers = new Set<{ id: string; signature: string; dispose(): void }>();
+  constructor(private readonly profiles: Profiles, private readonly guard: () => void = () => {}) {}
+
+  /** A search owns these transports; closing them must never interrupt an editor save. */
+  openReadSession(id: string): ReadSession {
+    const signature = JSON.stringify(this.profiles.get(id));
+    const isolated = new Connections(this.profiles, () => {
+      if (this.disposed || this.blocked.has(id)) throw vscode.FileSystemError.Unavailable('The server is disconnected.');
+      if (JSON.stringify(this.profiles.get(id)) !== signature) {
+        throw vscode.FileSystemError.Unavailable('Server settings changed. Start a new search.');
+      }
+    });
+    const reader = { id, signature, dispose: () => { isolated.dispose(); this.readers.delete(reader); } };
+    this.readers.add(reader);
+    return { run: operation => isolated.run(id, operation), dispose: reader.dispose };
+  }
 
   enable(id: string): void { this.blocked.delete(id); }
 
@@ -25,11 +44,14 @@ export class Connections implements vscode.Disposable {
     }
     const current = session;
     return current.queue.run(async () => {
+      this.guard();
       if (this.disposed || this.blocked.has(id)) {
         throw vscode.FileSystemError.Unavailable('The server is disconnected.');
       }
       const profile = this.profiles.get(id);
       const password = await this.profiles.password(id);
+      this.guard();
+      if (this.disposed) throw vscode.FileSystemError.Unavailable('The connection is closed.');
       const signature = createHash('sha256').update(JSON.stringify([profile, password])).digest('hex');
       if (current.signature !== signature) {
         current.client.close();
@@ -53,11 +75,17 @@ export class Connections implements vscode.Disposable {
         }
       }
       // Failed writes are never replayed. A closed connection is reopened on the next request.
+      this.guard();
+      if (this.disposed) throw vscode.FileSystemError.Unavailable('The connection is closed.');
       return operation(current.client, profile);
     });
   }
 
   async prune(): Promise<void> {
+    for (const reader of this.readers) {
+      try { if (JSON.stringify(this.profiles.get(reader.id)) === reader.signature) continue; } catch { /* Removed profile. */ }
+      reader.dispose();
+    }
     const ids = new Set(this.profiles.list().map(profile => profile.id));
     // Configuration removal retires the transport, not the user's ability to restore that entry.
     // Keep its queue so a rapid remove/re-add cannot create parallel queues for one URI.
@@ -67,6 +95,7 @@ export class Connections implements vscode.Disposable {
 
   async disconnect(id: string): Promise<void> {
     this.blocked.add(id);
+    for (const reader of this.readers) if (reader.id === id) reader.dispose();
     const session = this.sessions.get(id);
     if (session) {
       // Wait for an active save to finish before closing its transport.
@@ -76,6 +105,7 @@ export class Connections implements vscode.Disposable {
   }
   dispose(): void {
     this.disposed = true;
+    for (const reader of this.readers) reader.dispose();
     for (const session of this.sessions.values()) { session.client.close(); }
     this.sessions.clear();
   }

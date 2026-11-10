@@ -1,18 +1,30 @@
 import * as vscode from 'vscode';
 import { Writable } from 'node:stream';
-import { Connections } from './connections';
+import { Connections, ReadSession } from './connections';
 import { remotePath, SCHEME } from './model';
 import { SearchFileTooLarge, SearchMatch, SearchOptions, SearchSource, SearchSummary, searchRemote } from './searchEngine';
 
 export class FtpSearchSource implements SearchSource {
-  constructor(private readonly connections: Connections, private readonly id: string, private readonly token: vscode.CancellationToken) {}
+  private readonly readers: ReadSession[];
+  private readonly cancellation: vscode.Disposable;
+  private next = 0;
+  private stopped = false;
+  constructor(connections: Connections, id: string, private readonly token: vscode.CancellationToken, concurrency = 1) {
+    this.readers = Array.from({ length: concurrency }, () => connections.openReadSession(id));
+    this.cancellation = token.onCancellationRequested(() => this.stop());
+    if (token.isCancellationRequested) this.stop();
+  }
+  stop(): void {
+    this.stopped = true;
+    for (const reader of this.readers) reader.dispose();
+  }
+  dispose(): void { this.stop(); this.cancellation.dispose(); }
   private run<T>(work: (client: import('basic-ftp').Client, root: string) => Promise<T>): Promise<T> {
-    return this.connections.run(this.id, async (client, profile) => {
-      if (this.token.isCancellationRequested) throw new vscode.CancellationError();
-      // Installed only while THIS operation owns the queue, so cancellation cannot interrupt a save.
-      const listener = this.token.onCancellationRequested(() => client.close());
-      try { return await work(client, profile.rootPath); }
-      finally { listener.dispose(); }
+    if (this.stopped || this.token.isCancellationRequested) return Promise.reject(new vscode.CancellationError());
+    const reader = this.readers[this.next++ % this.readers.length];
+    return reader.run(async (client, profile) => {
+      if (this.stopped || this.token.isCancellationRequested) throw new vscode.CancellationError();
+      return work(client, profile.rootPath);
     });
   }
   list(path: string) {
@@ -73,15 +85,16 @@ export class SearchResults implements vscode.TreeDataProvider<Result>, vscode.Di
     if (this.running) throw new Error('Cancel the current search before starting another.');
     const token = new vscode.CancellationTokenSource(); this.active = token; this.running = true;
     this.heading = new vscode.TreeItem(`“${options.query}” in ${name}:${path}`);
-    this.heading.tooltip = `${options.caseSensitive ? 'Match case' : 'Ignore case'}\nExcluded: ${options.exclude.join(', ') || 'none'}\nMaximum file size: ${options.maxFileBytes / 1024 / 1024} MiB\nMaximum matches: ${options.maxResults}`;
+    this.heading.tooltip = `${options.caseSensitive ? 'Match case' : 'Ignore case'}\nFile types: ${options.extensions?.join(', ') || 'all'}\nSearch connections: ${options.concurrency ?? 1}\nExcluded: ${options.exclude.join(', ') || 'none'}\nMaximum file size: ${options.maxFileBytes / 1024 / 1024} MiB\nMaximum matches: ${options.maxResults}`;
     this.files.clear(); this.issues = []; this.status = `Searching ${name}: “${options.query}”…`; this.changed.fire();
     try {
       await vscode.commands.executeCommand('remoterfs.searchResults.focus');
       return await vscode.window.withProgress({ location: vscode.ProgressLocation.Notification,
         title: `FileBridge: Search ${name}`, cancellable: true }, async (progress, cancellation) => {
         const subscription = cancellation.onCancellationRequested(() => token.cancel());
+        const source = new FtpSearchSource(connections, id, token.token, options.concurrency ?? 1);
         try {
-          const summary = await searchRemote(new FtpSearchSource(connections, id, token.token), path, options,
+          const summary = await searchRemote(source, path, options,
             () => token.token.isCancellationRequested, match => {
               const uri = vscode.Uri.from({ scheme: SCHEME, authority: id, path: match.path });
               let file = this.files.get(match.path);
@@ -95,7 +108,7 @@ export class SearchResults implements vscode.TreeDataProvider<Result>, vscode.Di
           this.issues = summary.issues;
           if (summary.limited) this.issues.unshift('Search stopped at the result limit. Narrow the query or increase filebridge.search.maxResults.');
           return summary;
-        } finally { subscription.dispose(); }
+        } finally { source.dispose(); subscription.dispose(); }
       });
     } catch (error) { this.status = 'Search failed. Run Search Remote Files to retry.'; throw error; }
     finally { if (this.timer) clearTimeout(this.timer); this.timer = undefined; this.active = undefined; this.running = false; token.dispose(); this.changed.fire(); }

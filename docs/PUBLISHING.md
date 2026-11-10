@@ -4,20 +4,18 @@ FileBridge uses `publisher: Webobscure` and `name: filebridge` in
 `package.json`. Keep this identity in both registries. Manifest metadata and
 ownership of the GitHub repository do not establish registry permissions.
 
-## Readiness record — November 9, 2026
+## Readiness record — November 10, 2026
 
 | Registry | Confirmed | Still required |
 | --- | --- | --- |
 | Visual Studio Marketplace | `Webobscure` publisher created. The authenticated management page explicitly shows the current account's role as **Owner**. Public source and support links saved. | Publisher access is ready. Release upload and any automated publishing configuration are separate steps. |
-| Open VSX | Eclipse linked to `webobscure`; Publisher Agreement signed by the account holder. `Webobscure` namespace created; its settings show **Not verified**. Ownership request [#15480](https://github.com/EclipseFdn/open-vsx.org/issues/15480) submitted by `webobscure`. | Await administration's ownership decision. Recheck namespace verification and membership before releasing. |
+| Open VSX | Eclipse linked to `webobscure`; Publisher Agreement signed by the account holder. Ownership request [#15480](https://github.com/EclipseFdn/open-vsx.org/issues/15480) closed as completed with label **granted**. | Publish the first extension version and verify its public listing. Remove temporary Marketplace verification access. |
 
 Marketplace ownership is confirmed at
 [publisher management](https://marketplace.visualstudio.com/manage/publishers/Webobscure).
 The Open VSX account completed the agreement and namespace-creation prerequisites.
-A new namespace assigns its creator Contributor access under the documented
-registry rules; verified ownership is still pending. The namespace UI warns that
-extensions can remain inactive until ownership is verified. No extension has
-been uploaded during this check. No publishing tokens were created or stored.
+Namespace ownership has now been granted by the registry administrators. This
+approval establishes the publishing identity; it does not upload the VSIX.
 
 ## Visual Studio Marketplace
 
@@ -65,7 +63,7 @@ Sources: [publishing instructions](https://github.com/eclipse-openvsx/openvsx/wi
 Submitted: [Claiming namespace `Webobscure` — #15480](https://github.com/EclipseFdn/open-vsx.org/issues/15480).
 The request uses validation Option 2 (a Marketplace publisher without published
 extensions) and links the namespace, Marketplace publisher, source repository,
-and pinned manifest. It does not claim that approval has already been granted.
+and pinned manifest. The administrators granted it on November 9, 2026.
 
 After review, check that the Open VSX namespace is verified and `webobscure` is
 an Owner. Review Marketplace membership and remove any temporary verification

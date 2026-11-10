@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0
+
+- Search over up to three independent FTP/FTPS connections by default, configurable from one to five.
+- Keep editor opening and saving on a separate connection from search; cancellation only closes search connections.
+- Filter downloads by file extension, while keeping all file types and folders included by default.
+- Close search connections on completion, cancellation, disconnect, or changed server settings.
+
 ## 0.6.1
 
 - Add real screenshots, a short FTP workflow video, English listing copy, support links, and detailed upgrade/limitations guides.

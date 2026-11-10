@@ -192,8 +192,9 @@ to open that file at the matching line. Files do not need to have been opened
 before searching. Use **Cancel** in the progress notification or the stop button
 in the results panel to stop and retain partial results.
 
-FTP has no server-side content search: FileBridge downloads candidate files one
-at a time into memory and searches their server contents. A large project or a
+FTP has no server-side content search: FileBridge downloads candidate files into
+memory using up to three separate search connections by default. Opening and
+saving files use their own connection. A large project or a
 slow connection takes longer. Unsaved editor changes are not included. Search
 does not upload files or create a persistent local project copy.
 
@@ -209,6 +210,8 @@ Optional settings:
 ```json
 {
   "filebridge.search.exclude": ["node_modules", ".git", "storage/logs"],
+  "filebridge.search.connections": 3,
+  "filebridge.search.extensions": [".php", ".js", ".html"],
   "filebridge.search.maxFileSizeMB": 10,
   "filebridge.search.maxResults": 1000
 }
@@ -218,6 +221,10 @@ Exclusions are exact file/folder names anywhere, or paths relative to the chosen
 search folder. Excluded folders are not traversed; wildcards are not supported.
 Clear the exclusions to visit all folders. The size limit accepts 1–128 MiB and
 the result limit accepts 1–50,000 matches. The defaults are 10 MiB and 1,000.
+Search connections accept 1–5; choose 1 if your hosting limits simultaneous
+logins. File extensions are case-insensitive suffixes, without wildcards. An
+empty extension list (the default) includes all file types. Search connections
+close when the search ends or is cancelled. Results arrive in download order.
 
 Use FileBridge's command for remote search. The editor's standard `Cmd+Shift+F`
 / `Ctrl+Shift+F` is not connected to the FTP search implementation.
