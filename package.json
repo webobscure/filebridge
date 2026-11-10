@@ -2,7 +2,7 @@
   "name": "filebridge",
   "displayName": "FileBridge",
   "description": "Your server files, right in your editor. Browse, search, and edit FTP/FTPS files with changes saved directly to your server.",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "icon": "assets/filebridge-icon.png",
   "publisher": "Webobscure",
   "license": "MIT",

@@ -1,13 +1,32 @@
 import * as vscode from 'vscode';
-import { ServerProfile, validateProfile } from './model';
+import { SerialQueue, ServerProfile, validateProfile } from './model';
 import { parseRemotes } from './settings';
 
 export class Profiles {
-  constructor(private readonly context: vscode.ExtensionContext) {}
+  private saved: ServerProfile[];
+  private readonly writes = new SerialQueue();
+  constructor(private readonly context: vscode.ExtensionContext) {
+    this.saved = context.globalState.get<ServerProfile[]>('servers', []);
+    this.saved.forEach(validateProfile);
+  }
   private local(): ServerProfile[] {
-    const profiles = this.context.globalState.get<ServerProfile[]>('servers', []);
-    profiles.forEach(validateProfile);
-    return profiles;
+    // Older editors can deliver an earlier Memento storage notification after
+    // update() resolves. Keep this window's successful writes authoritative.
+    return [...this.saved];
+  }
+  private update(change: (current: ServerProfile[]) => ServerProfile[]): Promise<void> {
+    return this.writes.run(async () => {
+      const next = change(this.local());
+      next.forEach(validateProfile);
+      await this.context.globalState.update('servers', next);
+      this.saved = next;
+    });
+  }
+  mergeImported(profiles: ServerProfile[]): Promise<void> {
+    return this.update(current => {
+      const ids = new Set(current.map(profile => profile.id));
+      return [...current, ...profiles.filter(profile => !ids.has(profile.id))];
+    });
   }
   private configured() {
     return parseRemotes(vscode.workspace.getConfiguration('remotefs').get<unknown>('remote', {}));
@@ -24,7 +43,7 @@ export class Profiles {
     validateProfile(profile);
     await this.context.secrets.store(`password:${profile.id}`, password);
     try {
-      await this.context.globalState.update('servers', [...this.local(), profile]);
+      await this.update(current => [...current, profile]);
     } catch (error) {
       await this.context.secrets.delete(`password:${profile.id}`);
       throw error;
@@ -32,7 +51,7 @@ export class Profiles {
   }
   async remove(id: string): Promise<void> {
     if (this.get(id).configKey !== undefined) { throw new Error('Remove the connection from remotefs.remote in Settings.'); }
-    await this.context.globalState.update('servers', this.local().filter(p => p.id !== id));
+    await this.update(current => current.filter(p => p.id !== id));
     await this.context.secrets.delete(`password:${id}`);
   }
   async password(id: string): Promise<string> {

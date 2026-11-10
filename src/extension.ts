@@ -218,7 +218,7 @@ export function activate(context: vscode.ExtensionContext): MigrationTarget {
     }
   });
   return { importLegacyState: state => migrationQueue.run(async () => {
-    await importLegacyState(context, state);
+    await importLegacyState(context, state, imported => profiles.mergeImported(imported));
     tree.refresh();
     for (const folder of vscode.workspace.workspaceFolders ?? []) {
       if (folder.uri.scheme === SCHEME) { provider.refresh(folder.uri); }

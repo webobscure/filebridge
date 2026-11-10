@@ -92,3 +92,42 @@ test('settings profiles are never copied into local storage; inline passwords ta
   assert.deepEqual(profiles.list(), []);
   assert.throws(() => profiles.get(configured.id), /not found/);
 });
+
+test('late editor storage snapshots cannot drop successful profile imports or resurrect removed profiles', async () => {
+  const vscode = {workspace: {getConfiguration: () => ({get: () => ({})})},
+    FileSystemError: {Unavailable: message => new Error(message)}};
+  const { Profiles } = load('profiles', vscode);
+  const base = {id: 'one', name: 'One', protocol: 'ftp', host: 'localhost', port: 21,
+    username: 'user', rootPath: '/', timeout: 30000, atomicSave: true};
+  let snapshot = [], durable = [];
+  const store = new Profiles({globalState: {get: () => snapshot, update: async (_key, value) => {
+    durable = value; snapshot = value;
+    // Model an older editor delivering its previous storage notification late.
+    setImmediate(() => { snapshot = []; });
+  }}, secrets: {delete: async () => {}}});
+  await store.mergeImported([base]);
+  await new Promise(resolve => setImmediate(resolve));
+  await store.mergeImported([{...base, id: 'two'}]);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(store.list().map(profile => profile.id), ['one', 'two']);
+  assert.deepEqual(durable.map(profile => profile.id), ['one', 'two']);
+  await store.remove('one');
+  snapshot = [base, {...base, id: 'two'}];
+  assert.deepEqual(store.list().map(profile => profile.id), ['two']);
+});
+
+test('concurrent profile imports and wizard additions share one write queue', async () => {
+  const vscode = {workspace: {getConfiguration: () => ({get: () => ({})})},
+    FileSystemError: {Unavailable: message => new Error(message)}};
+  const { Profiles } = load('profiles', vscode);
+  const base = {id: 'wizard', name: 'Wizard', protocol: 'ftp', host: 'localhost', port: 21,
+    username: 'user', rootPath: '/', timeout: 30000, atomicSave: true};
+  let durable = [], active = 0, peak = 0;
+  const store = new Profiles({globalState: {get: () => [], update: async (_key, value) => {
+    peak = Math.max(peak, ++active);
+    await new Promise(resolve => setImmediate(resolve));
+    durable = value; active--;
+  }}, secrets: {store: async () => {}, delete: async () => {}}});
+  await Promise.all([store.add(base, 'fixture-secret'), store.mergeImported([{...base, id: 'imported'}])]);
+  assert.equal(peak, 1); assert.deepEqual(durable.map(profile => profile.id).sort(), ['imported', 'wizard']);
+});

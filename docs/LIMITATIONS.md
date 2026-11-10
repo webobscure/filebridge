@@ -46,6 +46,10 @@ limited to UTF-8 text files up to **32 MiB**, even if its search limit is higher
 
 ## Saves and remote changes
 
+Wizard-created connection profiles are kept in memory after this window's
+successful writes to protect against late storage notifications in older
+editors. Reload other open editor windows after changing wizard connections.
+
 The default save mode uploads a temporary sibling file, then replaces the target
 by rename. Servers must support that operation. Replacement may change file
 permissions or ownership. On servers that refuse it, use `atomicSave: false`

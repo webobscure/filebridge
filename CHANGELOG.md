@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.1
+
+- Preserve both sets of connections when importing concurrently in older editors, including VS Code 1.90 on Windows.
+- Serialize wizard and migration profile writes, retaining successful saves when older storage notifications arrive late.
+- Includes the parallel search and file-type filters introduced in 0.7.0.
+
 ## 0.7.0
 
 - Search over up to three independent FTP/FTPS connections by default, configurable from one to five.
