@@ -28,6 +28,10 @@ received the same VSIX; its contents match the successful v0.7.3 CI artifact.
 
 ## Visual Studio Marketplace
 
+The [Webobscure website](https://webobscure.gentle-bard-9614.chatgpt.site) is public.
+It currently uses a temporary hosting address; no eligible owned domain has been
+registered or verified. See [website maintenance and domain setup](WEBSITE.md).
+
 Open [publisher management](https://marketplace.visualstudio.com/manage) and
 select `Webobscure`. Inspect membership: use Owner or a role explicitly permitted
 to publish. A successful CLI authentication check alone does not establish a
