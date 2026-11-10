@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.2
+
+- Compress the existing icon without changing pixels to meet the Marketplace upload limit.
+- Reject oversized icons before packaging and refresh installation instructions for the registry release.
+
 ## 0.7.1
 
 - Preserve both sets of connections when importing concurrently in older editors, including VS Code 1.90 on Windows.

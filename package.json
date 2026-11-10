@@ -2,7 +2,7 @@
   "name": "filebridge",
   "displayName": "FileBridge",
   "description": "Your server files, right in your editor. Browse, search, and edit FTP/FTPS files with changes saved directly to your server.",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "icon": "assets/filebridge-icon.png",
   "publisher": "Webobscure",
   "license": "MIT",
@@ -137,7 +137,10 @@
         },
         "filebridge.search.extensions": {
           "type": "array",
-          "items": { "type": "string", "pattern": "^\\.[a-zA-Z0-9][a-zA-Z0-9._+-]*$" },
+          "items": {
+            "type": "string",
+            "pattern": "^\\.[a-zA-Z0-9][a-zA-Z0-9._+-]*$"
+          },
           "default": [],
           "description": "Only download files ending in these extensions (case-insensitive), for example [\".php\", \".js\", \".html\"]. Empty searches all file types. No wildcards."
         },

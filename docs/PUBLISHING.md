@@ -9,13 +9,16 @@ ownership of the GitHub repository do not establish registry permissions.
 | Registry | Confirmed | Still required |
 | --- | --- | --- |
 | Visual Studio Marketplace | `Webobscure` publisher created. The authenticated management page explicitly shows the current account's role as **Owner**. Public source and support links saved. | Publisher access is ready. Release upload and any automated publishing configuration are separate steps. |
-| Open VSX | Eclipse linked to `webobscure`; Publisher Agreement signed by the account holder. Ownership request [#15480](https://github.com/EclipseFdn/open-vsx.org/issues/15480) closed as completed with label **granted**. | Publish the first extension version and verify its public listing. Remove temporary Marketplace verification access. |
+| Open VSX | Eclipse linked to `webobscure`; Publisher Agreement signed by the account holder. Ownership request [#15480](https://github.com/EclipseFdn/open-vsx.org/issues/15480) closed as completed with label **granted**. Version **0.7.1** is publicly available with a verified publisher badge at the [extension listing](https://open-vsx.org/extension/Webobscure/filebridge). | Verify availability in Cursor separately. |
 
 Marketplace ownership is confirmed at
 [publisher management](https://marketplace.visualstudio.com/manage/publishers/Webobscure).
 The Open VSX account completed the agreement and namespace-creation prerequisites.
 Namespace ownership has now been granted by the registry administrators. This
-approval establishes the publishing identity; it does not upload the VSIX.
+approval establishes the publishing identity. The first VSIX, version 0.7.1,
+was subsequently uploaded and its public listing verified. Temporary Marketplace
+verification access has been removed; the publisher membership list contains only
+the account owner.
 
 ## Visual Studio Marketplace
 

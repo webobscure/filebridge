@@ -1,14 +1,15 @@
 # Upgrade to FileBridge
 
 Save or copy any unsaved remote edits before changing extensions. Install the
-current `filebridge-0.6.1.vsix` in VS Code/Cursor through **Extensions → … →
-Install from VSIX…**, then reload when prompted.
+current FileBridge by **Webobscure** from your editor's catalog, or download the
+main `filebridge-<version>.vsix` from the [latest GitHub Release](https://github.com/webobscure/filebridge/releases/latest)
+and use **Extensions → … → Install from VSIX…**. Reload when prompted.
 
 ## Choose your previous extension
 
 | Previous identifier / publisher | What to do |
 | --- | --- |
-| `Webobscure.filebridge`, version 0.5.0 or later | Install the newer VSIX. Connections, secure passwords, and remote URIs use the same identity. No helper is needed. |
+| `Webobscure.filebridge`, version 0.5.0 or later | Update from the editor's catalog or install the newer VSIX. Connections, secure passwords, and remote URIs use the same identity. No helper is needed. |
 | `FileBridge.filebridge`, version 0.4.0 | Use `filebridge-migration-from-0.4-0.4.1.vsix`, then install the current FileBridge. |
 | `remoter-fs-local.remoter-fs`, through 0.3.0 | Use `filebridge-migration-from-remoter-0.3.2.vsix`, then install the current FileBridge. |
 | Original `liximomo.remotefs` | Reuse supported FTP entries from `remotefs.remote`; see the dedicated instructions below. The FileBridge migration helpers do not target this extension. |
@@ -31,7 +32,7 @@ Password** once after upgrading.
 1. Save your remote edits.
 2. Install the matching helper from the table above. It replaces its matching
    old extension and reads that extension's local connection/password storage.
-3. Install `filebridge-0.6.1.vsix` and reload the editor.
+3. Install the current FileBridge and reload the editor.
 4. Wait for **Connections and saved passwords transferred**. To retry, run
    **FileBridge: Transfer Legacy Connections**, choosing the command with the
    matching source publisher.

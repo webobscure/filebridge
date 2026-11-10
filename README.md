@@ -45,19 +45,18 @@ The separate PhpStorm plugin is experimental and targets build 262 only.
 
 ## Install
 
-1. Open the **Extensions** panel in VS Code or Cursor.
-2. Open the `…` menu and select **Install from VSIX…**.
-3. Choose `filebridge-0.6.1.vsix`.
+1. Open the **Extensions** panel in VS Code or Cursor and search for **FileBridge** by **Webobscure**.
+2. Install it from your editor's catalog when available. Alternatively, download the main VSIX from the [latest GitHub Release](https://github.com/webobscure/filebridge/releases/latest).
+3. To install a downloaded package, open the `…` menu, select **Install from VSIX…**, and choose `filebridge-<version>.vsix`.
 4. Open the Command Palette: `Cmd+Shift+P` on macOS or `Ctrl+Shift+P` on Windows/Linux.
 5. Run **FileBridge: Add Server**, or configure a connection in JSON as shown below.
 
-FileBridge ships as a VSIX package. Download the `filebridge-release` artifact
-from a successful [CI run](https://github.com/webobscure/filebridge/actions/workflows/ci.yml),
-or use a published [GitHub Release](https://github.com/webobscure/filebridge/releases)
-when available. It is not published to an extension registry. It requires a
-desktop editor supporting VS Code API 1.90 or later.
+FileBridge is published on [Open VSX](https://open-vsx.org/extension/Webobscure/filebridge).
+Availability in Cursor can lag behind the registry. VSIX downloads are also
+available from [GitHub Releases](https://github.com/webobscure/filebridge/releases).
+It requires a desktop editor supporting VS Code API 1.90 or later.
 
-The extension details page should show **FileBridge 0.6.1**, publisher
+The extension details page should show **FileBridge**, publisher
 **Webobscure**, and identifier `Webobscure.filebridge` (case-insensitive).
 
 ### Upgrade from an earlier publisher
@@ -72,7 +71,7 @@ both previous identities: `remoter-fs-local.remoter-fs` (through 0.3.0) and
 `remotefs.remote` setting, internal commands, and remote folder URIs remain compatible.
 
 If all your connections and passwords are in `settings.json`, disable the old
-extension, install FileBridge 0.6.1, and reload the editor. Your JSON configuration
+extension, install the current FileBridge, and reload the editor. Your JSON configuration
 will be read by FileBridge directly.
 
 To also keep wizard-created connections and passwords saved in secure storage:
@@ -82,7 +81,7 @@ To also keep wizard-created connections and passwords saved in secure storage:
    - **FileBridge** (0.4.0): `filebridge-migration-from-0.4-0.4.1.vsix`.
    - **remoter-fs-local** (through 0.3.0): `filebridge-migration-from-remoter-0.3.2.vsix`.
    Each helper replaces its corresponding old extension and uses that extension's storage.
-3. Install `filebridge-0.6.1.vsix` and reload the editor.
+3. Install the current FileBridge and reload the editor.
 4. Wait for **Connections and saved passwords transferred**. If needed, run
    **FileBridge: Transfer Legacy Connections** with the matching source name from the Command Palette.
 5. Uninstall **FileBridge Migration Helper** after the success notification.
@@ -283,7 +282,7 @@ resolution with the same size, and races immediately before rename, may go undet
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for cross-platform tests and
-[RELEASING.md](RELEASING.md) for versioning, checksums, and automated draft releases.
+[RELEASING.md](RELEASING.md) for versioning, checksums, and automated GitHub releases.
 
 GitHub Actions tests actual VS Code instances on Windows and Linux with
 both 1.90.0 and current stable, and builds/verifies the native PhpStorm plugin.
