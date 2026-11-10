@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.3
+
+- Resize the existing icon to 512×512 for Marketplace compatibility.
+- Check PNG format and dimensions before packaging, in addition to file size.
+
 ## 0.7.2
 
 - Compress the existing icon without changing pixels to meet the Marketplace upload limit.
