@@ -14,7 +14,8 @@
 | Folder deletion | Recursive deletion supported by Explorer | Empty folders only |
 
 The native plugin has transport tests and binary compatibility verification.
-Its editor UI/save workflow still needs validation in a licensed PhpStorm.
+Manual browsing, save/failure/retry, and search/navigation checks passed in
+licensed PhpStorm 2026.2.2 on macOS; see [the validation record](../jetbrains/VALIDATION.md).
 The VS Code video and screenshots are explicitly demonstrations of that editor;
 they do not establish native PhpStorm UI behavior.
 

@@ -1,4 +1,4 @@
-<p><strong>FileBridge — your server files, right in your editor.</strong></p>
+<p><strong>Browse, search, and edit FTP/FTPS files in PhpStorm.</strong></p>
 <p>Browse FTP/FTPS folders in PhpStorm, open a remote UTF-8 file, and upload your edits with explicit Save. Configure connections using the familiar <code>remotefs.remote</code> JSON format.</p>
 <ul>
   <li>Browse server folders in the FileBridge tool window.</li>
@@ -8,6 +8,7 @@
   <li>Use temporary upload and rename, with checks for some external changes.</li>
 </ul>
 <p><strong>Get started:</strong> install the native ZIP through Settings → Plugins → Install Plugin from Disk. Add your connection JSON in Settings → Tools → FileBridge, then open View → Tool Windows → FileBridge.</p>
-<p><strong>Experimental:</strong> targets PhpStorm 2026.2.x (build 262). Transport tests and binary compatibility checks have passed; editor UI/save behavior still requires validation in a licensed IDE. Normal IDE autosave does not upload. Editing supports UTF-8 files up to 32 MiB; search defaults to 10 MiB and 1,000 matches. SFTP/SSH, symbolic-link traversal, and full project synchronization are unsupported.</p>
+<p><strong>Experimental:</strong> targets PhpStorm 2026.2.x (build 262). Transport tests and binary compatibility checks have passed. Browsing, explicit Save, failed-upload recovery/retry, and remote search/navigation have been checked in PhpStorm 2026.2.2 on macOS. Normal IDE autosave does not upload. Editing supports UTF-8 files up to 32 MiB; search defaults to 10 MiB and 1,000 matches. SFTP/SSH, symbolic-link traversal, and full project synchronization are unsupported.</p>
+<p>PhpStorm may ask you to allow editing a non-project file on the first change to a remote editor cache. Choose <strong>This file</strong>. Widen the FileBridge tool window to show all toolbar actions.</p>
 <p>FTP is unencrypted. FTPS validates the server certificate. The standard Find in Files command does not search the full FTP server; use Search in the FileBridge tool window.</p>
 <p><a href="https://github.com/webobscure/filebridge">Source code</a> · <a href="https://github.com/webobscure/filebridge/issues/new/choose">Support and bug reports</a> · <a href="https://github.com/webobscure/filebridge/blob/HEAD/jetbrains/README.md">Setup guide</a> · <a href="https://github.com/webobscure/filebridge/blob/HEAD/docs/LIMITATIONS.md">Known limitations</a> · <a href="https://github.com/webobscure/filebridge/blob/HEAD/docs/UPGRADING.md">Moving from older versions</a></p>

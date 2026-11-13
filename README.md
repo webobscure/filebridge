@@ -293,7 +293,7 @@ Release packages are assembled only after all checks pass. Reports include the
 actual tested editor versions and architectures; see the workflow run for results.
 
 A native **FileBridge for PhpStorm** build is available as
-`filebridge-phpstorm-0.2.1.zip`, targeting PhpStorm 2026.2.x. Its sources, build
+`filebridge-phpstorm-0.2.2.zip`, targeting PhpStorm 2026.2.x. Its sources, build
 script, setup instructions, and validation status are in `jetbrains/README.md`.
 VS Code/Cursor continue to use the VSIX package described above.
 

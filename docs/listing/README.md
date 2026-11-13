@@ -32,9 +32,11 @@ The MP4 is assembled from timestamped captures of the actual demo window; its
 effective capture frame rate is low, while the encoded video plays at 30 fps.
 No UI screenshots are generated illustrations or mockups.
 
-The native plugin does not yet have an independently validated IDE UI recording.
-Use the prepared native text and compatibility information without presenting
-the VS Code captures as PhpStorm UI.
+Native PhpStorm captures are separate under `docs/media/jetbrains/`: successful
+server save, remote search, result navigation, and failed-upload retention.
+They were captured in a disposable licensed PhpStorm window on November 13,
+2026. See `jetbrains/VALIDATION.md` for server-byte checks. There is no native
+video yet; do not present the VS Code recording as PhpStorm UI.
 
 ## Reproduce a demonstration
 

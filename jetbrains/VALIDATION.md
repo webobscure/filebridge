@@ -1,4 +1,11 @@
-# FileBridge for PhpStorm 0.2.1 validation
+# FileBridge for PhpStorm 0.2.2 validation
+
+Checked November 13, 2026. The transport and manual IDE checks used 0.2.1.
+Version 0.2.2 changes release metadata and documentation only; all of its Java
+class bytes match the tested ZIP. ZIP integrity, embedded description, version,
+vendor, change notes, separate dependency JAR, and absence of test classes were
+checked. Release ZIP SHA-256:
+`e6eacaebb209bbe52e8649d037f2d5a95f891f25041557fdef2ab2a0926080a7`.
 
 ## Target and build
 
@@ -29,12 +36,42 @@ Tests used loopback-only pyftpdlib servers and disposable fixture data.
 JetBrains Plugin Verifier 1.411, offline, against the installed PhpStorm:
 
 ```text
-Plugin com.webobscure.filebridge:0.2.1 against PS-262.10315.130: Compatible
+Plugin com.webobscure.filebridge:0.2.2 against PS-262.10315.130: Compatible
 Dynamic Plugin Eligibility:
     Plugin can probably be enabled or disabled without IDE restart
 ```
 
-The full local report is under `jetbrains/build/verifier-offline/PS-262.10315.130/`.
+The full local report is under `test-results/plugin-verifier/PS-262.10315.130/`.
+
+## Manual IDE checks: passed
+
+The clean distribution ZIP was installed through **Install Plugin from Disk**
+in the user's licensed PhpStorm. FileBridge became available without restarting
+the IDE. Checks used a separate disposable `demo-project` window and an FTP
+server bound only to `127.0.0.1`; no existing server profiles were changed.
+
+- Added the familiar `remotefs.remote` JSON configuration to an empty FileBridge
+  configuration and expanded the server to browse `index.php` and `src`.
+- Opened remote `index.php`, edited it, and pressed Cmd+S. The IDE showed
+  **Uploaded /index.php**; reading the fixture file independently confirmed the
+  changed server bytes.
+- Searched for `bridge-search-check` in the previously unopened `src/config.php`.
+  The search reported one match, two files searched, and zero errors. Opening
+  the result placed the editor caret at **5:25**.
+- Rejected STOR in the FTP fixture. Explicit Save showed **Upload failed**,
+  preserved the original server bytes, and wrote the changed text to `.unsent`.
+  Removed the rejection and pressed Cmd+S again: the upload succeeded and the
+  server contained the retained edits.
+- Edited the file again and switched tabs without saving explicitly. The server
+  bytes stayed unchanged. A subsequent Cmd+S uploaded the new text.
+
+The first edit of a cached remote file triggered PhpStorm's **Non-Project Files
+Protection** dialog. Only **This file** was allowed. Users may encounter the
+same prompt; the plugin does not disable protection for other files.
+
+Genuine captures are in `docs/media/jetbrains/`. They show the disposable IDE
+window, not the user's working project. The single-row toolbar can require a
+wider tool window to reveal all actions.
 
 ## Runtime test limitation
 
@@ -49,6 +86,8 @@ stopped before executing the tests with:
 No valid license found
 ```
 
-These editor integration checks, the search dialog/navigation, and visual UI inspection remain unverified.
+The automated IDE starter remains unexecuted. The manual checks above establish
+the listed save, failure/retry, search/navigation, and UI behavior on this target;
+they do not establish runtime compatibility with other IDEs or operating systems.
 No license files were copied and no license checks were bypassed. The user's
 normal PhpStorm configuration was not used by the test runner.

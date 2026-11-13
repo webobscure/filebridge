@@ -94,3 +94,10 @@ ownership. It requires a website on an owned domain linking to the Open VSX
 listing, a matching listing homepage, and a request on the Cursor forum.
 
 Source: [Cursor extension documentation](https://cursor.com/help/customization/extensions).
+
+## JetBrains Marketplace
+
+The native plugin has a separate identity, `com.webobscure.filebridge`, and a
+separate Vendor profile. Follow the [native release procedure](JETBRAINS_PUBLISHING.md)
+and check the [validation record](../jetbrains/VALIDATION.md) before uploading.
+VS Code/Open VSX publishing rights do not grant JetBrains publishing rights.

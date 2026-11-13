@@ -1,15 +1,22 @@
 <idea-plugin>
   <id>com.webobscure.filebridge</id>
   <name>FileBridge</name>
-  <vendor url="https://github.com/webobscure">Webobscure</vendor>
-  <url>https://github.com/webobscure/filebridge</url>
-  <version>0.2.1</version>
+  <vendor url="https://webobscure.github.io/">Webobscure</vendor>
+  <url>https://webobscure.github.io/filebridge/</url>
+  <version>0.2.2</version>
   <description><![CDATA[
     Browse FTP/FTPS servers, edit remote UTF-8 files, and upload changes with Save.
     Configure connections with the same remotefs.remote JSON format as FileBridge for VS Code and Cursor.
     Includes secure password storage, temporary upload and rename, and remote change checks.
     Search remote UTF-8 file contents recursively, including unopened files, with line navigation and cancellation.
   ]]></description>
+  <change-notes><![CDATA[
+    <p>0.2.2</p>
+    <ul>
+      <li>Add the FileBridge website and release notes to the plugin metadata.</li>
+      <li>Prepare the native distribution for JetBrains Marketplace.</li>
+    </ul>
+  ]]></change-notes>
   <idea-version since-build="262" until-build="262.*"/>
   <depends>com.intellij.modules.platform</depends>
   <extensions defaultExtensionNs="com.intellij">

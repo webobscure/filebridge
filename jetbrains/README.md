@@ -11,7 +11,7 @@ This native build targets **PhpStorm 2026.2.x**, including the installed
 
 1. In PhpStorm, open **Settings → Plugins**.
 2. Open the gear menu and choose **Install Plugin from Disk…**.
-3. Select `filebridge-phpstorm-0.2.1.zip` from the workspace root.
+3. Select `filebridge-phpstorm-0.2.2.zip` from the workspace root or GitHub release.
 4. Restart the IDE if prompted.
 5. Open **Settings → Tools → FileBridge** and paste your connection JSON.
 6. Open **View → Tool Windows → FileBridge**, or use its right-side tool window button.
@@ -56,6 +56,9 @@ the IDE's `filebridge.xml`, with settings roaming disabled.
 Expand a server to load its folders. Double-click a file or press Enter to open
 it in the editor. Its tab includes the server name. Use **Refresh**, **+ File**,
 **+ Folder**, **Rename**, and **Delete** in the FileBridge toolbar.
+Widen the tool window if some toolbar actions are clipped. On the first edit,
+PhpStorm may show **Non-Project Files Protection** because the editor cache is
+outside the project. Choose **This file** to allow editing that remote file.
 
 Uploads happen on explicit Save. Normal IDE autosave does not upload remote
 files. Wait for **Uploaded /path** before closing the project or exiting.
@@ -143,8 +146,10 @@ failure preservation, direct overwrite, permissions, TLS validation, and login
 rejection, recursive search, hidden files, exclusions, limits, cancellation,
 UTF-8 positions, and FTPS search. The native IDE test starter is included in test sources only.
 Its isolated PhpStorm run currently stops with **No valid license found** before
-executing editor-save checks. Compilation and transport tests do not establish
-that the IDE UI, search dialog/navigation, and save hook have passed a full runtime test.
+executing editor-save checks. Separate manual checks in licensed PhpStorm
+2026.2.2 passed browsing, explicit Save with server-byte verification, recursive
+search and line navigation, failed-upload recovery, retry, and switching tabs
+without uploading. See `VALIDATION.md` for the exact scope and genuine captures.
 
 JetBrains Plugin Verifier **1.411**, run offline against **PS-262.10315.130**,
 reports **Compatible**. The report is recorded in `jetbrains/VALIDATION.md`;
