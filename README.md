@@ -1,5 +1,6 @@
 # FileBridge
 
+[Website](https://webobscure.github.io/filebridge/) ·
 [Source](https://github.com/webobscure/filebridge) ·
 [Report a bug](https://github.com/webobscure/filebridge/issues) ·
 [Builds and checks](https://github.com/webobscure/filebridge/actions/workflows/ci.yml)

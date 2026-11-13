@@ -28,8 +28,8 @@ received the same VSIX; its contents match the successful v0.7.3 CI artifact.
 
 ## Visual Studio Marketplace
 
-The [Webobscure website](https://webobscure.gentle-bard-9614.chatgpt.site) is public.
-It currently uses a temporary hosting address; no eligible owned domain has been
+The [Webobscure website](https://webobscure.github.io/) uses GitHub Pages.
+It currently uses a github.io address; no eligible owned domain has been
 registered or verified. See [website maintenance and domain setup](WEBSITE.md).
 
 Open [publisher management](https://marketplace.visualstudio.com/manage) and

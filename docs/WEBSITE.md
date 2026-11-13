@@ -1,32 +1,48 @@
 # Webobscure website
 
-Public website: [webobscure.gentle-bard-9614.chatgpt.site](https://webobscure.gentle-bard-9614.chatgpt.site).
+Public website: [webobscure.github.io](https://webobscure.github.io/).
+Source repository: [webobscure/webobscure.github.io](https://github.com/webobscure/webobscure.github.io).
 
 - `/`: publisher introduction and FileBridge overview.
-- `/filebridge`: interactive illustration, recorded demo, installation links, and limitations.
-- `/privacy`: information about the website and external services.
+- `/filebridge/`: interactive illustration, recorded demo, installation links, and limitations.
+- `/privacy/`: information about the website and external services.
 
-The English site is built with the Sites Vinext starter. Its local source is in
-`website-webobscure/`, a separate Git checkout backed by the Sites source
-repository. The extension repository and VSIX packaging explicitly exclude that
-directory. Production assets use the existing FileBridge logo and demo recording.
+The English site uses Next.js static export. Its local source is in
+`website-github-pages/`, an independent Git checkout. The extension repository
+and VSIX packaging exclude both this directory and the earlier Sites checkout
+`website-webobscure/`. Website assets reuse the existing FileBridge logo and demo.
 
-Update the site through the Sites source workflow: preserve its project ID in
-`.openai/hosting.json`, build and verify changes, push source, save a version,
-and deploy that saved version. Publishing credentials must stay out of source.
+## Build and update
 
-The initial public release is Site version 1, source commit
-`de610d32b5005554c01a4f4684d80e66af27115c`. TypeScript and production build
-checks passed. Browser checks covered page navigation, the illustrative save and
-search interactions, FAQ expansion, video loading, and a 390-pixel mobile viewport.
+Use Node.js 22 or later in the website checkout:
+
+```sh
+npm ci
+npm run build
+npm run check
+npm run verify
+```
+
+The `out/` directory contains the entire deployable site, including directory
+indexes for direct page links, video, captions, sitemap, and `.nojekyll`.
+The export check validates all three pages and their local links and assets.
+No application server, database, or Sites account is required to serve it.
+
+Push website changes to the default `feature/github-pages` branch in the website
+repository. Its Pages workflow builds, checks, and publishes automatically.
+Pull requests run checks without deployment. The deploy job uses GitHub's
+short-lived OIDC credentials; no publishing PAT is stored.
+
+The original Sites version remains a separate historical deployment. The
+GitHub Pages website is the primary address; update this repository's website
+links when changing the public origin.
 
 ## Custom domain
 
-No custom domain is registered or attached. The current address is a temporary
-hosting address, not evidence of ownership of an eligible Marketplace domain.
-When the account holder chooses and registers a domain, attach it to this Site,
-apply the returned DNS records, and update metadata and links to the verified
-origin. Buying a domain and changing DNS are separate actions.
+No custom domain is registered or attached. The github.io address does not prove
+ownership of an eligible Microsoft Marketplace domain. When the account holder
+chooses and registers a domain, configure it in GitHub Pages, apply GitHub's DNS
+records, verify HTTPS, and update metadata and links to the new origin.
 
 Microsoft Marketplace publisher verification also requires the publisher's
 extension history and domain registration to meet its minimum age requirements;
