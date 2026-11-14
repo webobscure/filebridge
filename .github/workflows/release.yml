@@ -56,3 +56,38 @@ jobs:
             flags=(--latest)
           fi
           gh release create "$RELEASE_TAG" release/* --verify-tag "${flags[@]}" --title "FileBridge $RELEASE_TAG" --notes-file release-notes.md
+  publish-open-vsx:
+    name: Publish FileBridge to Open VSX
+    needs: publish
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: filebridge-release
+          path: release
+      - name: Verify release downloads
+        working-directory: release
+        run: sha256sum --check SHA256SUMS
+      - name: Publish the tested main VSIX using OIDC
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          version=$(node -e 'const p = require("./package.json"); if (p.publisher !== "Webobscure" || p.name !== "filebridge") throw new Error("Unexpected Open VSX extension identity"); console.log(p.version)')
+          test "$RELEASE_TAG" = "v$version"
+          vsix="release/filebridge-$version.vsix"
+          test -f "$vsix"
+          flags=()
+          if [[ "$RELEASE_TAG" == *-* ]]; then
+            flags+=(--pre-release)
+          fi
+          npm exec --yes --package=ovsx@1.4.0 -- ovsx --registryUrl https://open-vsx.org publish "$vsix" --trusted-publishing "${flags[@]}"

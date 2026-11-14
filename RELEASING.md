@@ -58,9 +58,20 @@ from that version's `CHANGELOG.md` section. A failed validation, test, build, or
 checksum check prevents publication. Ordinary branch pushes do not publish a
 release; pushing the version tag is the release action.
 
-Review the version and changelog before pushing its tag. Marketplace and Open
-VSX publishing require their own publisher credentials and remain separate
-actions.
+Review the version and changelog before pushing its tag. After the GitHub Release
+is published, **Publish FileBridge to Open VSX** verifies the downloaded packages'
+checksums and publishes only `filebridge-VERSION.vsix` using Trusted Publishing
+(OIDC). Prerelease tags also mark the Open VSX upload as a prerelease. Migration
+helpers and the native PhpStorm ZIP are never uploaded to Open VSX.
+
+This requires the trusted-publisher registration below. Branch and PR builds do
+not publish; no new version or tag is created by changing this workflow. Existing
+published versions are not uploaded again automatically. Visual Studio Marketplace
+publishing remains a separate action.
+
+If the Open VSX job fails after GitHub Release succeeded, correct the registry
+configuration and rerun only the failed job, retaining the same tested artifact.
+Do not rerun the successful GitHub Release creation job for an existing release.
 
 Before the first registry release, complete the account and ownership checks in
 [Publisher setup](docs/PUBLISHING.md).
