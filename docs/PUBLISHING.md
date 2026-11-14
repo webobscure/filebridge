@@ -96,7 +96,9 @@ Register these exact values for **Webobscure.filebridge** in
 
 Registration grants the matching workflow publishing access to this extension.
 Open VSX trusts that workflow on any branch or tag; our workflow runs publication
-only for release tags. Keep control of workflow changes. If a publishing
+only for stable release tags (without a prerelease suffix). Prereleases remain
+GitHub-only because `ovsx --pre-release` cannot change an already built VSIX.
+Keep control of workflow changes. If a publishing
 environment is added later, its name must match in both the job and registration.
 The registration is confirmed; the first automated upload is not yet verified.
 A branch CI run cannot test the registry's OIDC exchange; that

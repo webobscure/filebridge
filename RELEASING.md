@@ -61,8 +61,8 @@ release; pushing the version tag is the release action.
 Review the version and changelog before pushing its tag. After the GitHub Release
 is published, **Publish FileBridge to Open VSX** verifies the downloaded packages'
 checksums and publishes only `filebridge-VERSION.vsix` using Trusted Publishing
-(OIDC). Prerelease tags also mark the Open VSX upload as a prerelease. Migration
-helpers and the native PhpStorm ZIP are never uploaded to Open VSX.
+(OIDC). Only stable tags publish to Open VSX; prerelease tags remain GitHub-only.
+Migration helpers and the native PhpStorm ZIP are never uploaded to Open VSX.
 
 This requires the trusted-publisher registration below. Branch and PR builds do
 not publish; no new version or tag is created by changing this workflow. Existing

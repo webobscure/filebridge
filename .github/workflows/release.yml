@@ -59,6 +59,8 @@ jobs:
   publish-open-vsx:
     name: Publish FileBridge to Open VSX
     needs: publish
+    # Pre-release metadata must be set while packaging, not while uploading an existing VSIX.
+    if: ${{ !contains(github.ref_name, '-') }}
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -86,8 +88,4 @@ jobs:
           test "$RELEASE_TAG" = "v$version"
           vsix="release/filebridge-$version.vsix"
           test -f "$vsix"
-          flags=()
-          if [[ "$RELEASE_TAG" == *-* ]]; then
-            flags+=(--pre-release)
-          fi
-          npm exec --yes --package=ovsx@1.4.0 -- ovsx --registryUrl https://open-vsx.org publish "$vsix" --trusted-publishing "${flags[@]}"
+          npm exec --yes --package=ovsx@1.4.0 -- ovsx --registryUrl https://open-vsx.org publish "$vsix" --trusted-publishing
