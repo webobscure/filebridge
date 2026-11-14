@@ -42,8 +42,8 @@ For future automation, prefer Trusted Publishing with GitHub OIDC over a stored
 PAT. Global Azure DevOps PATs retire on December 1, 2026. Configure a policy only
 after the publishing workflow is reviewed: repository owner `webobscure`,
 repository `filebridge`, and the exact workflow filename and environment.
-The existing `release.yml` publishes GitHub Releases after successful checks;
-it does not publish to a registry.
+The existing `release.yml` publishes GitHub Releases and then the main VSIX to
+Open VSX after successful checks. It does not publish to Visual Studio Marketplace.
 
 Source: [official publishing documentation](https://code.visualstudio.com/api/working-with-extensions/publishing-extension).
 
@@ -70,6 +70,41 @@ or put them in issue text, screenshots, release notes, or chat.
 
 Sources: [publishing instructions](https://github.com/eclipse-openvsx/openvsx/wiki/Publishing-Extensions),
 [namespace access and ownership](https://github.com/eclipse-openvsx/openvsx/wiki/Namespace-Access).
+
+### Open VSX Trusted Publishing
+
+Confirmed November 14, 2026 in Open VSX extension settings: the GitHub trusted
+publisher is registered for `webobscure/filebridge`, workflow `release.yml`,
+with no environment restriction.
+
+The `publish-open-vsx` job in `.github/workflows/release.yml` uses the official
+`ovsx` CLI pinned to **1.4.0** and requests `id-token: write` only for that job.
+It uploads the exact versioned main VSIX from the successful CI artifact after
+checking SHA256SUMS. It does not rebuild the extension during publication and
+does not use a personal access token.
+
+Register these exact values for **Webobscure.filebridge** in
+[extension settings](https://open-vsx.org/user-settings/extensions/Webobscure/filebridge):
+
+| Field | Value |
+| --- | --- |
+| Publisher | GitHub |
+| Organization or User name | `webobscure` (no URL prefix) |
+| Repository name | `filebridge` |
+| Workflow filename | `release.yml` (filename only) |
+| Environment name | Empty: the publishing job does not declare an environment |
+
+Registration grants the matching workflow publishing access to this extension.
+Open VSX trusts that workflow on any branch or tag; our workflow runs publication
+only for stable release tags (without a prerelease suffix). Prereleases remain
+GitHub-only because `ovsx --pre-release` cannot change an already built VSIX.
+Keep control of workflow changes. If a publishing
+environment is added later, its name must match in both the job and registration.
+The registration is confirmed; the first automated upload is not yet verified.
+A branch CI run cannot test the registry's OIDC exchange; that
+happens during the next authorized version-tag release.
+
+Source: [official Trusted Publishing documentation](https://github.com/eclipse-openvsx/openvsx/wiki/Trusted-Publishing).
 
 ### Namespace ownership request
 
